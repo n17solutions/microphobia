@@ -1,0 +1,2 @@
+dotnet ef migrations add InitialCreate --context PostgresHarnessContext --project Microphobia.Dashboard.Harness.WebApi --startup-project Microphobia.Dashboard.Harness.WebApi --output-dir Migrations/Postgres
+dotnet ef database update --project Microphobia.Dashboard.Harness.WebApi --startup-project Microphobia.Dashboard.Harness.WebApi --context PostgresHarnessContext

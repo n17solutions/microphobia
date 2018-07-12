@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>N17Solutions.Microphobia.ServiceResolution</AssemblyName>
+    <RootNamespace>N17Solutions.Microphobia.ServiceResolution</RootNamespace>
+  </PropertyGroup>
+</Project>

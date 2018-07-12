@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microphobia.Dashboard\Microphobia.Dashboard.csproj" />
+    <ProjectReference Include="..\Microphobia.Postgres\Microphobia.Postgres.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>N17Solutions.Microphobia.Dashboard.Harness.Console</AssemblyName>
+    <RootNamespace>N17Solutions.Microphobia.Dashboard.Harness.Console</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microphobia.Dashboard\Microphobia.Dashboard.csproj" />
+    <ProjectReference Include="..\Microphobia.Postgres\Microphobia.Postgres.csproj" />
+  </ItemGroup>
+</Project>

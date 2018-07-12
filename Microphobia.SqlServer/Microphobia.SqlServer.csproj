@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>N17Solutions.Microphobia.SqlServer</PackageId>
+    <Authors>James Woodley</Authors>
+    <Company>N17 Solutions</Company>
+    <Title>Microphobia - Sql Server</Title>
+    <Description>Long Running Process Execution in Dotnet. Runs long running processes in the background of your application allowing you to fire and forget any long running processes you may need to execute. Targeted toward Sql Server.</Description>
+    <PackageTags>n17solutions;micro;phobia;microphobia;long running process;background process;sqlserver</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0</PackageVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>N17Solutions.Microphobia.SqlServer</AssemblyName>
+    <RootNamespace>N17Solutions.Microphobia.SqlServer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Data.EntityFramework\Data.EntityFramework.csproj" />
+    <ProjectReference Include="..\Microphobia\Microphobia.csproj" />
+  </ItemGroup>
+</Project>
