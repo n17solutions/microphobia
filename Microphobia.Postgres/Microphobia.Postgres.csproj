@@ -18,6 +18,7 @@
     <InformationalVersion>1.0.0</InformationalVersion>
     <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
+    <NuspecFile>Microphobia.Postgres.nuspec</NuspecFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
