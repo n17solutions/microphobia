@@ -4,6 +4,7 @@
     <AssemblyName>N17Solutions.Microphobia.Postgres</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Postgres</RootNamespace>
   </PropertyGroup>
+    
   <PropertyGroup>
     <PackageId>N17Solutions.Microphobia.Postgres</PackageId>
     <Authors>James Woodley</Authors>
@@ -18,11 +19,12 @@
     <InformationalVersion>1.0.0</InformationalVersion>
     <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
-    <NuspecFile>Microphobia.Postgres.nuspec</NuspecFile>
   </PropertyGroup>
+    
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
   </ItemGroup>
+    
   <ItemGroup>
     <ProjectReference Include="..\Data.EntityFramework\Data.EntityFramework.csproj" />
     <ProjectReference Include="..\Microphobia\Microphobia.csproj" />

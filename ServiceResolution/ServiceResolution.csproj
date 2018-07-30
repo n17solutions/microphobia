@@ -1,8 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.ServiceResolution</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.ServiceResolution</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>N17Solutions.Microphobia.ServiceResolution</PackageId>
+    <Authors>James Woodley</Authors>
+    <Company>N17 Solutions</Company>
+    <Title>Microphobia - Service Resolution</Title>
+    <Description>Long Running Process Execution in Dotnet. Runs long running processes in the background of your application allowing you to fire and forget any long running processes you may need to execute. Helper elements to get Service Resolution and Dependency Injection available.</Description>
+    <PackageTags>n17solutions;micro;phobia;microphobia;long running process;background process;service resolution;dependency injection;inversion of control</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0</PackageVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
   </PropertyGroup>
 </Project>
