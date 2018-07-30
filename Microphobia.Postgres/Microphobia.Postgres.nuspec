@@ -10,6 +10,11 @@
         <copyright>$copyright$</copyright>
         <references>
             <reference file="N17Solutions.Microphobia.Data.EntityFramework.dll" />
+            <reference file="N17Solutions.Microphobia.dll" />
+            <reference file="N17Solutions.Microphobia.Domain.dll" />
+            <reference file="N17Solutions.Microphobia.ServiceContract.dll" />
+            <reference file="N17Solutions.Microphobia.ServiceResolution.dll" />
+            <reference file="N17Solutions.Microphobia.Utilities.dll" />
         </references>
     </metadata>
 </package>
