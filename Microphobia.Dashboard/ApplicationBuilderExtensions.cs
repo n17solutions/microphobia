@@ -51,8 +51,9 @@ namespace N17Solutions.Microphobia.Dashboard
             app.UseMiddleware<DashboardMiddleware>(options);
             
             var sourceFolder = options.IsDevelopment
-                ? "/Users/wooderz/Development/Microphobia/Microphobia.Dashboard/ClientApp/src"
+                ? "/Users/wooderz/Development/Microphobia/Microphobia.Dashboard/wwwroot/build"
                 : "/clientApp";
+            
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(sourceFolder)

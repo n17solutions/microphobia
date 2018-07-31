@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    
+        <title>%(DocumentTitle)</title>
+    
+        <!-- Google Fonts -->
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Cairo" type="text/css" />
+    
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous" />
+    </head>
+    
+    <body>
+        <div id="app">
+            <header>
+                <h1>Microphobia</h1>
+                <h2>Long Running Process Execution - Storage in Use: %(StorageInUse)</h2>
+                <h3>
+                    Current System Status:
+                    {{ systemStatus }}
+                    <i class="fas" :class="systemStatus === 'Stopped' ? 'fa-ban' : 'fa-play-circle'"></i>
+                </h3>
+            </header>
+        
+            <section class="swimlanes">
+                <div class="swimlanes__column">
+                    <h6>Created</h6>
+                    <ul class="swimlanes__list">
+                        <task-item v-for="task in createdTasks" v-bind="{ task }" :key="task.id"></task-item>
+                    </ul>
+                </div>
+                <div class="swimlanes__column">
+                    <h6>Waiting To Run</h6>
+                    <ul class="swimlanes__list">
+                        <task-item v-for="task in waitingToRunTasks" v-bind="{ task }" :key="task.id"></task-item>
+                    </ul>
+                </div>
+                <div class="swimlanes__column">
+                    <h6>Running</h6>
+                    <ul class="swimlanes__list">
+                        <task-item v-for="task in runningTasks"
+                                   v-bind:task="task"
+                                   v-bind:icon="{ svg: './images/clock.svg', fallback: './images/clock.gif' }"
+                                   :key="task.id"></task-item>
+                    </ul>
+                </div>
+                <div class="swimlanes__column completed">
+                    <h6>Completed</h6>
+                    <ul class="swimlanes__list">
+                        <task-item v-for="task in completedTasks" v-bind="{ task }" :key="task.id"></task-item>
+                    </ul>
+                </div>
+                <div class="swimlanes__column faulted">
+                    <h6>Faulted</h6>
+                    <ul class="swimlanes__list">
+                        <task-item v-for="task in faultedTasks" v-bind="{ task }" :key="task.id"></task-item>
+                    </ul>
+                </div>
+            </section>
+        
+            <modal v-if="openTaskModal" @close="hideTaskModal" v-bind="{ currentTask }"></modal>
+        </div>
+        
+        <script type="text/x-template" id="task-template">
+            <li class="swimlanes__listItem" v-on:click="showTaskModal(task.id)">
+                <img v-if="icon" :src="icon.svg" :onerror="fallback" />
+                <div class="item">
+                    <label>Type Name:</label>
+                    <article>{{ task.typeName }}</article>
+                </div>
+                <div class="item">
+                    <label>Method Name:</label>
+                    <article>{{ task.methodName }}</article>
+                </div>
+                <div class="item">
+                    <label>Created:</label>
+                    <article>{{ task.dateCreated }}</article>
+                </div>
+            </li>
+        </script>
+    
+        <script type="text/x-template" id="modal-template">
+            <transition name="modal">
+                <div class="modal-mask">
+                    <div class="modal-wrapper">
+                        <div class="modal-container">
+        
+                            <div class="modal-body">
+                                <div>
+                                    <label>Type Name:</label>
+                                    <article>{{ currentTask.typeName }}</article>
+                                </div>
+        
+                                <div>
+                                    <label>Method Name:</label>
+                                    <article>{{ currentTask.methodName }}</article>
+                                </div>
+        
+                                <div>
+                                    <label>Created:</label>
+                                    <article>{{ currentTask.dateCreated }}</article>
+                                </div>
+                                <div>
+                                    <label>Current Status:</label>
+                                    <article>{{ currentTask.status }}</article>
+                                </div>
+                                <div v-if="currentTask.canReEnqueue">
+                                    <label>Failure Information:</label>
+                                    <article class="pre">
+                                        <pre>{{ currentTask.failureDetails }}</pre>
+                                    </article>
+                                </div>
+                            </div>
+        
+                            <div class="modal-footer">
+                                <slot name="footer">
+                                    <div class="reenqueue" v-if="currentTask.canReEnqueue" v-on:click="reenqueueTask(currentTask.id)">
+                                        <i title="Reenqueue Task" class="reenqueue-button fas fa-play-circle"></i>
+                                        Re-Enqueue Task
+                                    </div>
+                                    <i title="Close Window" class="far fa-window-close modal-default-button" @click="$emit('close')"></i>
+                                </slot>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </script>
+        
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/javascript" src="vendor.min.6bea09fac8467c53cab9.js"></script><script type="text/javascript" src="microphobia.min.6bea09fac8467c53cab9.js"></script></body>
+</html>

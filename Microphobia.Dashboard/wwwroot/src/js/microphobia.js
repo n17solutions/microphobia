@@ -1,3 +1,5 @@
+import * as signalR from '@aspnet/signalr';
+
 const TASK_STATUS_CREATED = 0;
 const TASK_STATUS_WAITINGTORUN = 2;
 const TASK_STATUS_RUNNING = 3;
