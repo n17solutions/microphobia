@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -20,8 +21,7 @@ namespace N17Solutions.Microphobia.Dashboard
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseMicrophobiaDashboard(this IApplicationBuilder app, Action<MicrophobiaDashboardOptions> setupAction = null,
-            IServiceCollection serviceCollection = null)
+        public static IApplicationBuilder UseMicrophobiaDashboard(this IApplicationBuilder app, Action<MicrophobiaDashboardOptions> setupAction = null)
         {
             var options = new MicrophobiaDashboardOptions();
             setupAction?.Invoke(options);
@@ -32,20 +32,17 @@ namespace N17Solutions.Microphobia.Dashboard
 
             app.UseBranchedApplicationBuilder(routePrefix, services =>
             {
-                var serviceProvider = serviceCollection == null
-                    ? app.ApplicationServices
-                    : serviceCollection.BuildServiceProvider();
-
-                services.AddTransient(_ => serviceProvider.GetRequiredService<IDataProvider>());
-                services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaConfiguration>());
-                services.AddScoped(_ => serviceProvider.GetRequiredService<Client>());
-                
+                services.ConfigureDashboardServiceProvider(app.ApplicationServices);
+                                                
                 services.ConfigureServicesForStandaloneMicrophobiaDashboard();
             }, builderConfig =>
             {
                 builderConfig.ConfigureApplicationForMicrophobiaDashboard(options);
             });
-            
+
+            var hubContext = app.ApplicationServices.GetRequiredService<MicrophobiaHubContext>();
+            hubContext.ReplaceHubContext(app.ApplicationServices.GetRequiredService<IHubContext<MicrophobiaHub>>());
+
             return app;
         }
 
@@ -54,11 +51,6 @@ namespace N17Solutions.Microphobia.Dashboard
             app.UseMvc();
 
             app.UseMiddleware<DashboardMiddleware>(options);
-
-//            app.UseStaticFiles(new StaticFileOptions
-//            {
-//                FileProvider = new EmbeddedFileProvider(typeof(ApplicationBuilderExtensions).GetTypeInfo().Assembly)
-//            });
 
             return app;
         }

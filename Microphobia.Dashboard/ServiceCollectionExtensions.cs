@@ -1,5 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.Extensions;
+using N17Solutions.Microphobia.ServiceContract.Providers;
+using N17Solutions.Microphobia.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.Dashboard
 {
@@ -17,6 +22,15 @@ namespace N17Solutions.Microphobia.Dashboard
                 });
 
             return services;
+        }
+
+        public static void ConfigureDashboardServiceProvider(this IServiceCollection services, IServiceProvider serviceProvider)
+        {
+            services.AddSignalR();
+            
+            services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaConfiguration>());
+            services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaHubContext>());
+            services.AddTransient(_ => serviceProvider.GetRequiredService<IDataProvider>());            
         }
     }
 }

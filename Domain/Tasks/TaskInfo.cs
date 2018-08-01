@@ -66,6 +66,7 @@ namespace N17Solutions.Microphobia.Domain.Tasks
             ReturnType = response.ReturnType.FullName;
             Status = response.Status;
             DateCreated = response.DateCreated;
+            DateLastUpdated = response.DateLastUpdated;
             FailureDetails = response.FailureDetails;
             Data = TaskInfoSerialization.Serialize(response);
         }
@@ -91,6 +92,7 @@ namespace N17Solutions.Microphobia.Domain.Tasks
             // Why don't we do this in the object initializer?
             // Because the dates haven't been populated, until the TaskInfo has been created!
             response.DateCreated = taskInfo.DateCreated;
+            response.DateLastUpdated = taskInfo.DateLastUpdated;
             taskInfo.Data = TaskInfoSerialization.Serialize(response);
 
             return taskInfo;

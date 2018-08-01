@@ -13,9 +13,9 @@ namespace N17Solutions.Microphobia
     public class Queue
     {
         private readonly IDataProvider _dataProvider;
-        private readonly IHubContext<MicrophobiaHub> _taskHubContext;
+        private readonly MicrophobiaHubContext _taskHubContext;
 
-        public Queue(IDataProvider dataProvider, IHubContext<MicrophobiaHub> taskHubContext)
+        public Queue(IDataProvider dataProvider, MicrophobiaHubContext taskHubContext)
         {
             _dataProvider = dataProvider;
             _taskHubContext = taskHubContext;
@@ -78,14 +78,14 @@ namespace N17Solutions.Microphobia
                 task.Status = status;
                 await _dataProvider.Save(task);
 
-                await MicrophobiaHubActions.RefreshTasks(_taskHubContext.Clients.All);
+                await _taskHubContext.RefreshTasks();
             }
         }
         
         private Task Enqueue(TaskInfo taskInfo)
         {
             taskInfo.Status = TaskStatus.Created;
-            return Task.WhenAll(_dataProvider.Enqueue(taskInfo), MicrophobiaHubActions.RefreshTasks(_taskHubContext.Clients.All));
+            return Task.WhenAll(_dataProvider.Enqueue(taskInfo), _taskHubContext.RefreshTasks());
         }
     }
 }

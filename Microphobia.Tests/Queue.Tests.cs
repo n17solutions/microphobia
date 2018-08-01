@@ -36,8 +36,9 @@ namespace N17Solutions.Microphobia.Tests
             hubClientsMock.SetupGet(x => x.All).Returns(clientsProxyMock.Object);
             var hubContextMock = new Mock<IHubContext<MicrophobiaHub>>();
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
+            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);
             
-            _sut = new Queue(_dataProviderMock.Object, hubContextMock.Object);
+            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock);
         }
 
         [Fact]

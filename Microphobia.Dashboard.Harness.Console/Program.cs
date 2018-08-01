@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.Utilities.Configuration;
+using N17Solutions.Microphobia.Websockets.Hubs;
 using PostgresBootstrapper = N17Solutions.Microphobia.Postgres.Bootstrapper;
 using DashboardBootstrapper = N17Solutions.Microphobia.Dashboard.Bootstrapper;
 
 namespace N17Solutions.Microphobia.Dashboard.Harness.Console
 {
+    static class Enqueuer
+    {
+        public static void EnqueueMe() => System.Console.WriteLine("HELLO!");
+    }
+    
     class Program
     {
         private static readonly object Lock = new object();
@@ -40,8 +49,7 @@ namespace N17Solutions.Microphobia.Dashboard.Harness.Console
                 }
 
                 client?.Start();
-
-                DashboardBootstrapper.Strap(services);
+                DashboardBootstrapper.Strap(serviceProvider);
             });
 
             exitEvent.WaitOne();

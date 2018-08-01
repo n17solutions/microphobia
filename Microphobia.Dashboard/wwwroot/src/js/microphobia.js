@@ -1,3 +1,6 @@
+import clockImage from '../images/clock.gif';
+import clockSvg from '../images/clock.svg'
+
 import * as signalR from '@aspnet/signalr';
 
 const TASK_STATUS_CREATED = 0;
@@ -11,6 +14,8 @@ const SYSTEM_STATUS_STOPPED = 'Stopped';
 const vm = new Vue({
     el: '#app',
     data: {
+        clockImage,
+        clockSvg,
         currentTask: {},
         tasks: [],
         systemStatus: '',
@@ -53,17 +58,7 @@ const vm = new Vue({
         const taskFetcher = () => {
             axios.get('./api/tasks')
                 .then(response => {
-                    this.tasks = response.data.map(task => {
-                        return {
-                            id          : task.id,
-                            assemblyName: task.assemblyName,
-                            typeName    : task.typeName, 
-                            methodName  : task.methodName,
-                            status      : task.status, 
-                            statusId    : task.statusId, 
-                            dateCreated : task.dateCreated
-                        };
-                    });
+                    this.tasks = response.data;
                 });
         };
         

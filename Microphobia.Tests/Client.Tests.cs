@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using N17Solutions.Microphobia.Configuration;
-using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using N17Solutions.Microphobia.Websockets.Hubs;
@@ -74,8 +73,9 @@ namespace N17Solutions.Microphobia.Tests
             hubClientsMock.SetupGet(x => x.All).Returns(clientsProxyMock.Object);
             var hubContextMock = new Mock<IHubContext<MicrophobiaHub>>();
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
+            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);            
             
-            _sut = new Client(new Queue(_dataProviderMock.Object, hubContextMock.Object), new MicrophobiaConfiguration(hubContextMock.Object), _loggerFactoryMock.Object);
+            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock), new MicrophobiaConfiguration(microphobiaContextMock), _loggerFactoryMock.Object);
         }
 
         [Fact]

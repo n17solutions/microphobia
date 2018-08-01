@@ -32,7 +32,6 @@ namespace N17Solutions.Microphobia.Dashboard
         public DashboardMiddleware(RequestDelegate next, IHostingEnvironment hostingEnv, ILoggerFactory loggerFactory, MicrophobiaConfiguration config,
             MicrophobiaDashboardOptions options)
         {
-            //_next = next;
             _config = config;
             _options = options ?? new MicrophobiaDashboardOptions();
             _staticFileMiddleware = CreateStaticFileMiddleware(next, hostingEnv, loggerFactory, options);

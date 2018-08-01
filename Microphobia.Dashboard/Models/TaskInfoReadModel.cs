@@ -14,6 +14,7 @@ namespace N17Solutions.Microphobia.Dashboard.Models
         public string Status { get; }
         public uint StatusId { get; }
         public string DateCreated { get; }
+        public string DateLastUpdated { get; }
         public string FailureDetails { get; }
 
         public TaskInfoReadModel(TaskInfo taskInfo)
@@ -25,15 +26,8 @@ namespace N17Solutions.Microphobia.Dashboard.Models
             Status = taskInfo.Status.Humanize().Transform(To.TitleCase);
             StatusId = (uint) taskInfo.Status;
             DateCreated = taskInfo.DateCreated.Humanize();
+            DateLastUpdated = taskInfo.DateLastUpdated.Humanize();
             FailureDetails = taskInfo.FailureDetails;
-        }
-
-        private string EnvironmentToHtml(string input)
-        {
-            var htmlBuilder = new StringBuilder(input);
-            htmlBuilder.Replace(Environment.NewLine, "<br />");
-
-            return htmlBuilder.ToString();
         }
     }
 }

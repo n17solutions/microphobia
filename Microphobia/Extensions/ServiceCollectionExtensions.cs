@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using N17Solutions.Microphobia.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.Extensions
 {
@@ -9,6 +11,7 @@ namespace N17Solutions.Microphobia.Extensions
             services.AddSignalR();
             
             return services
+                .AddSingleton(serviceProvider => new MicrophobiaHubContext(serviceProvider.GetRequiredService<IHubContext<MicrophobiaHub>>()))
                 .AddScoped<Queue>()
                 .AddScoped<Client>();
         }

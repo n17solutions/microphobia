@@ -29,7 +29,7 @@ namespace N17Solutions.Microphobia.SqlServer.Extensions
                 .AddEntityFramework()
                 .AddMicrophobia();
 
-            services.AddSingleton(serviceProvider => new MicrophobiaConfiguration(serviceProvider.GetRequiredService<IHubContext<MicrophobiaHub>>())
+            services.AddSingleton(serviceProvider => new MicrophobiaConfiguration(serviceProvider.GetRequiredService<MicrophobiaHubContext>())
             {
                 StorageType = Storage.SqlServer,
                 ServiceFactory = serviceProvider.GetService

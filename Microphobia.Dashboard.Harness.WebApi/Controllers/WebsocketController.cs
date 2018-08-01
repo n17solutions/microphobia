@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using N17Solutions.Microphobia.Websockets.Hubs;
 
 namespace Microphobia.Dashboard.Harness.WebApi.Controllers
@@ -8,9 +7,9 @@ namespace Microphobia.Dashboard.Harness.WebApi.Controllers
     [Route("api/[controller]")]
     public class WebsocketController : ControllerBase
     {
-        private readonly IHubContext<MicrophobiaHub> _hubContext;
+        private readonly MicrophobiaHubContext _hubContext;
 
-        public WebsocketController(IHubContext<MicrophobiaHub> hubContext)
+        public WebsocketController(MicrophobiaHubContext hubContext)
         {
             _hubContext = hubContext;
         }
@@ -18,7 +17,7 @@ namespace Microphobia.Dashboard.Harness.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post()
         {
-            await MicrophobiaHubActions.RefreshTasks(_hubContext.Clients.All);
+            await _hubContext.RefreshTasks();
             return Ok();
         }
     }

@@ -50,7 +50,11 @@ module.exports = {
         use: {
             loader: 'babel-loader'
         }
-      }
+      },
+        {
+         test: /\.(png|svg|jpg|gif)$/,
+            use: 'file-loader'
+        }
     ]
   },
 
@@ -58,6 +62,7 @@ module.exports = {
     modules: [
       resolve('src'),
       resolve('src/css'),
+        resolve('src/images'),
       'node_modules'
     ]
   },

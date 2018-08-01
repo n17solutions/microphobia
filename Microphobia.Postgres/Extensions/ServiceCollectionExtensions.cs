@@ -23,11 +23,11 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
             Migrate(connectionString);
 
             services
-                .AddDbContext<TaskContext>(options => options.UseNpgsql(connectionString))
+                .AddDbContext<TaskContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Transient)
                 .AddEntityFramework()
                 .AddMicrophobia();
             
-            services.AddSingleton(serviceProvider => new MicrophobiaConfiguration(serviceProvider.GetRequiredService<IHubContext<MicrophobiaHub>>())
+            services.AddSingleton(serviceProvider => new MicrophobiaConfiguration(serviceProvider.GetRequiredService<MicrophobiaHubContext>())
             {
                 StorageType = Storage.Postgres,
                 ServiceFactory = serviceProvider.GetService

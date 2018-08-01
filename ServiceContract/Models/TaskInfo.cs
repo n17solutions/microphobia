@@ -51,5 +51,10 @@ namespace N17Solutions.Microphobia.ServiceContract.Models
         /// The Date this Task was created.
         /// </summary>
         public DateTime DateCreated { get; set; }
+        
+        /// <summary>
+        /// The Date this Task was last updated.
+        /// </summary>
+        public DateTime DateLastUpdated { get; set; }
     }
 }

@@ -7,14 +7,14 @@ namespace N17Solutions.Microphobia.Configuration
 {
     public class MicrophobiaConfiguration
     {
-        private readonly IHubContext<MicrophobiaHub> _microphobiaHub;
+        private readonly MicrophobiaHubContext _microphobiaHub;
         private bool _isRunning;
 
-        public MicrophobiaConfiguration(IHubContext<MicrophobiaHub> microphobiaHub)
+        public MicrophobiaConfiguration(MicrophobiaHubContext microphobiaHub)
         {
-            _microphobiaHub = microphobiaHub;
+            _microphobiaHub = microphobiaHub;            
         }
-
+        
         public int PollIntervalMs { get; set; } = 100;
         
         public Storage StorageType { get; set; }
@@ -27,7 +27,7 @@ namespace N17Solutions.Microphobia.Configuration
             set
             {
                 _isRunning = value;
-                MicrophobiaHubActions.RefreshSystemStatus(_microphobiaHub.Clients.All);
+                _microphobiaHub.RefreshSystemStatus();
             }
         }
     }

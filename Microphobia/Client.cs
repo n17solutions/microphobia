@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.ServiceContract;
-using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.Utilities.Extensions;
 
@@ -13,25 +12,13 @@ namespace N17Solutions.Microphobia
 {
     public class Client
     {
-        private bool _cancelled, _started;
+        private bool _cancelled;
 
         private readonly Queue _queue;
         private readonly MicrophobiaConfiguration _config;
         private readonly ILogger _logger;
         
         private static readonly object Lock = new object();
-
-        public bool IsRunning
-        {
-            get
-            {
-                bool isRunning;
-                lock (Lock)
-                    isRunning = _started;
-
-                return isRunning;
-            }
-        }
 
         public Client(Queue queue, MicrophobiaConfiguration config, ILoggerFactory loggerFactory)
         {
@@ -94,7 +81,6 @@ namespace N17Solutions.Microphobia
 
         private void SetStarted()
         {
-            _started = true;
             _config.IsRunning = true;
             
             Console.WriteLine("Microphobia Client Started...");
@@ -102,7 +88,6 @@ namespace N17Solutions.Microphobia
 
         private void SetStopped()
         {
-            _started = false;
             _config.IsRunning = false;
             _cancelled = false;
             
