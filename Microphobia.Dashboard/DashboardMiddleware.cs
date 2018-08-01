@@ -1,26 +1,41 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using N17Solutions.Microphobia.Configuration;
-using N17Solutions.Microphobia.ServiceContract.Configuration;
 
 namespace N17Solutions.Microphobia.Dashboard
 {
     public class DashboardMiddleware
     {
-        private readonly RequestDelegate _next;
+        private const string EmbeddedFileNamespace = "N17Solutions.Microphobia.Dashboard.wwwroot.build";
+        
         private readonly MicrophobiaDashboardOptions _options;
         private readonly MicrophobiaConfiguration _config;
+        private readonly StaticFileMiddleware _staticFileMiddleware;
+        
+        public DashboardMiddleware(RequestDelegate next, IHostingEnvironment hostingEnv, ILoggerFactory loggerFactory, MicrophobiaConfiguration config, 
+            IOptions<MicrophobiaDashboardOptions> optionsAccessor)
+            :this(next, hostingEnv, loggerFactory, config, optionsAccessor.Value)
+        {}
 
-        public DashboardMiddleware(RequestDelegate next, MicrophobiaConfiguration config, MicrophobiaDashboardOptions options)
+        public DashboardMiddleware(RequestDelegate next, IHostingEnvironment hostingEnv, ILoggerFactory loggerFactory, MicrophobiaConfiguration config,
+            MicrophobiaDashboardOptions options)
         {
-            _next = next;
+            //_next = next;
             _config = config;
-            _options = options;
+            _options = options ?? new MicrophobiaDashboardOptions();
+            _staticFileMiddleware = CreateStaticFileMiddleware(next, hostingEnv, loggerFactory, options);
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -47,34 +62,22 @@ namespace N17Solutions.Microphobia.Dashboard
                 case "GET" when Regex.IsMatch(path, "/?index.html"):
                     httpContext.Response.StatusCode = 200;
                     httpContext.Response.ContentType = "text/html";
-                    
-                    var originalStream = httpContext.Response.Body;
-                    
-                    using (var newStream = new MemoryStream())
+
+                    using (var stream = _options.IndexStream())
                     {
-                        httpContext.Response.Body = newStream;
-                        await _next(httpContext);
-                        
-                        newStream.Seek(0, SeekOrigin.Begin);
-                        
-                        var html = await new StreamReader(newStream).ReadToEndAsync();
+                        var html = await new StreamReader(stream).ReadToEndAsync();
                         var htmlBuilder = new StringBuilder(html);
+
                         foreach (var entry in GetIndexParameters())
-                        {
                             htmlBuilder.Replace(entry.Key, entry.Value);
-                        }
 
-                        newStream.Seek(0, SeekOrigin.Begin);
-
-                        httpContext.Response.Body = originalStream;
-                        httpContext.Response.ContentLength = htmlBuilder.ToString().Length;
-                        await httpContext.Response.WriteAsync(htmlBuilder.ToString());
+                        await httpContext.Response.WriteAsync(htmlBuilder.ToString(), Encoding.UTF8);
                     }
 
                     return;
             }
 
-            await _next(httpContext);
+            await _staticFileMiddleware.Invoke(httpContext);
         }
 
         private IDictionary<string, string> GetIndexParameters()
@@ -84,6 +87,20 @@ namespace N17Solutions.Microphobia.Dashboard
                 {"%(DocumentTitle)", _options.DocumentTitle},
                 {"%(StorageInUse)", _config.StorageType.ToString()}
             };
+        }
+        
+        private StaticFileMiddleware CreateStaticFileMiddleware(
+            RequestDelegate next,
+            IHostingEnvironment hostingEnv,
+            ILoggerFactory loggerFactory,
+            MicrophobiaDashboardOptions options)
+        {
+            var staticFileOptions = new StaticFileOptions
+            {               
+                FileProvider = new EmbeddedFileProvider(typeof(DashboardMiddleware).GetTypeInfo().Assembly, EmbeddedFileNamespace),
+            };
+
+            return new StaticFileMiddleware(next, hostingEnv, Options.Create(staticFileOptions), loggerFactory);
         }
     }
 }

@@ -2,12 +2,16 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.Websockets.Hubs;
@@ -51,12 +55,10 @@ namespace N17Solutions.Microphobia.Dashboard
 
             app.UseMiddleware<DashboardMiddleware>(options);
 
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot/build");
-            
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(filePath)
-            });
+//            app.UseStaticFiles(new StaticFileOptions
+//            {
+//                FileProvider = new EmbeddedFileProvider(typeof(ApplicationBuilderExtensions).GetTypeInfo().Assembly)
+//            });
 
             return app;
         }

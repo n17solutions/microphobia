@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="BuildWebApp;CopyWebAppFiles">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="BuildWebApp">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <AssemblyName>N17Solutions.Microphobia.Dashboard</AssemblyName>
@@ -27,6 +27,7 @@
         <!-- Don't publish the SPA source files, but do show them in the project files list -->
         <Content Remove="$(SpaRoot)**" />
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+        <EmbeddedResource Include="$(SpaRoot)build/**" Exclude="@(EmbeddedResource)" />
     </ItemGroup>
     
     <ItemGroup>
@@ -57,17 +58,5 @@
         
         <Message Importance="high" Text="Building WebApp..." />
         <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />        
-    </Target>
-
-    <ItemGroup>
-        <WebAppFiles Include="$(SpaRoot)build\**" />
-    </ItemGroup>
-    
-    <Target Name="CopyWebAppFiles" Condition=" Exists('$(SpaRoot)build') ">
-        <Message Importance="high" Text="Copying File: @(WebAppFiles->'%(FullPath)')" />
-        <Copy SourceFiles="@(WebAppFiles->'%(FullPath)')" DestinationFiles="$(OutDir)\wwwroot\build\%(RecursiveDir)\%(Filename)%(Extension)" />
-        <ItemGroup>
-            <None Include="@(WebAppFiles)" CopyToOutputDirectory="Always" />
-        </ItemGroup>
     </Target>
 </Project>
