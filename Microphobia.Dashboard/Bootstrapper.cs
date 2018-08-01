@@ -66,7 +66,7 @@ namespace N17Solutions.Microphobia.Dashboard
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMicrophobiaDashboard(options => { options.IsDevelopment = true; }, _serviceCollection);
+            app.UseMicrophobiaDashboard(serviceCollection: _serviceCollection);
         }
     }
 }

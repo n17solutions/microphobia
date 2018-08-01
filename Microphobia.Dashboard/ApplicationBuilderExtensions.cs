@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
@@ -49,14 +50,12 @@ namespace N17Solutions.Microphobia.Dashboard
             app.UseMvc();
 
             app.UseMiddleware<DashboardMiddleware>(options);
-            
-            var sourceFolder = options.IsDevelopment
-                ? "/Users/wooderz/Development/Microphobia/Microphobia.Dashboard/wwwroot/build"
-                : "/clientApp";
+
+            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot/build");
             
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(sourceFolder)
+                FileProvider = new PhysicalFileProvider(filePath)
             });
 
             return app;

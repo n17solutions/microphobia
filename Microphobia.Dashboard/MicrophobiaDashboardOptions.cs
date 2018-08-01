@@ -9,9 +9,6 @@ namespace N17Solutions.Microphobia.Dashboard
         /// </summary>
         public string RoutePrefix { get; set; } = "microphobia";
 
-        [Obsolete("DELETE THIS BEFORE RELEASE")]
-        public bool IsDevelopment { get; set; }
-        
         /// <summary>
         /// Gets or sets a title for the microphobia dashboard page
         /// </summary>

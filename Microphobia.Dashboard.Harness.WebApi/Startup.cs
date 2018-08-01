@@ -47,10 +47,7 @@ namespace Microphobia.Dashboard.Harness.WebApi
             }
 
             app.UseMicrophobia();
-            app.UseMicrophobiaDashboard(options =>
-            {
-                options.IsDevelopment = true;
-            });
+            app.UseMicrophobiaDashboard();
 
             app.UseMvc();
 
