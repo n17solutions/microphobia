@@ -58,6 +58,15 @@ namespace N17Solutions.Microphobia.Tests
                     fs.Write(info, 0, info.Length);
                 }
             }
+
+            public void FileCreatorWithGuidArgument(Guid argument)
+            {
+                using (var fs = File.Create("TEST.txt"))
+                {
+                    var info = new UTF8Encoding(true).GetBytes(argument.ToString());
+                    fs.Write(info, 0, info.Length);
+                }
+            }
         }
 
         private readonly Mock<IDataProvider> _dataProviderMock = new Mock<IDataProvider>();
@@ -161,6 +170,23 @@ namespace N17Solutions.Microphobia.Tests
              // Assert
              File.Exists("TEST.txt").ShouldBeTrue();
          }
+
+        [Fact]
+        public void Should_Perform_Task_With_A_Guid_Argument()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            File.Delete("TEST.txt");
+            Expression<Action<TestOperations>> expression = to => to.FileCreatorWithGuidArgument(guid);
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
+
+            // Act
+            _sut.Start();
+            Thread.Sleep(10000);
+
+            // Assert
+            File.Exists("TEST.txt").ShouldBeTrue();
+        }
 
         public void Dispose()
         {

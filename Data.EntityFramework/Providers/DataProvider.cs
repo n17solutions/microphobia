@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using N17Solutions.Microphobia.Domain.Tasks;
-using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using TaskInfo = N17Solutions.Microphobia.ServiceContract.Models.TaskInfo;
 
