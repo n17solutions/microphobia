@@ -10,6 +10,7 @@ using N17Solutions.Microphobia.Data.EntityFramework.Extensions;
 using N17Solutions.Microphobia.Extensions;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Enums;
+using N17Solutions.Microphobia.ServiceResolution;
 using N17Solutions.Microphobia.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.Postgres.Extensions
@@ -18,7 +19,7 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
     {
         public const string PostgresHistoryTableName = "__MicrophobiaMigrationsHistory";
         
-        public static IServiceCollection AddMicrophobiaPostgresStorage(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddMicrophobiaPostgresStorage(this IServiceCollection services, string connectionString, ServiceFactory serviceFactory = null)
         {
             Migrate(connectionString);
 
@@ -30,7 +31,7 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
             services.AddSingleton(serviceProvider => new MicrophobiaConfiguration(serviceProvider.GetRequiredService<MicrophobiaHubContext>())
             {
                 StorageType = Storage.Postgres,
-                ServiceFactory = serviceProvider.GetService
+                ServiceFactory = serviceFactory ?? serviceProvider.GetService
             });
             
             return services;
