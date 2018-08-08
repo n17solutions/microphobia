@@ -2,9 +2,10 @@
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
+using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
+using N17Solutions.Microphobia.ServiceResolution;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using N17Solutions.Microphobia.Websockets.Hubs;
 
@@ -14,23 +15,25 @@ namespace N17Solutions.Microphobia
     {
         private readonly IDataProvider _dataProvider;
         private readonly MicrophobiaHubContext _taskHubContext;
+        private readonly MicrophobiaConfiguration _config;
 
-        public Queue(IDataProvider dataProvider, MicrophobiaHubContext taskHubContext)
+        public Queue(IDataProvider dataProvider, MicrophobiaHubContext taskHubContext, MicrophobiaConfiguration config)
         {
             _dataProvider = dataProvider;
             _taskHubContext = taskHubContext;
+            _config = config;
         }
 
-        public Task Enqueue(Expression<Action> expression)
+        public Task Enqueue(Expression<Action> expression, ServiceFactory scopedServiceFactory = null)
         {
             var taskInfo = expression.ToTaskInfo();
-            return Enqueue(taskInfo);
+            return Enqueue(taskInfo, scopedServiceFactory);
         }
 
-        public Task Enqueue<TExecutor>(Expression<Action<TExecutor>> expression)
+        public Task Enqueue<TExecutor>(Expression<Action<TExecutor>> expression, ServiceFactory scopedServiceFactory = null)
         {
             var taskInfo = expression.ToTaskInfo();
-            return Enqueue(taskInfo);
+            return Enqueue(taskInfo, scopedServiceFactory);
         }
         
         public async Task<TaskInfo> Dequeue()
@@ -82,8 +85,11 @@ namespace N17Solutions.Microphobia
             }
         }
         
-        private Task Enqueue(TaskInfo taskInfo)
+        private Task Enqueue(TaskInfo taskInfo, ServiceFactory scopedServiceFactory = null)
         {
+            if (scopedServiceFactory != null)
+                _config.ScopedServiceFactories.AddOrUpdate(taskInfo.Id, scopedServiceFactory, (guid, factory) => scopedServiceFactory);
+            
             taskInfo.Status = TaskStatus.Created;
             return Task.WhenAll(_dataProvider.Enqueue(taskInfo), _taskHubContext.RefreshTasks());
         }

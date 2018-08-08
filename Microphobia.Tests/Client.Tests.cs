@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
+using N17Solutions.Microphobia.ServiceResolution;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using N17Solutions.Microphobia.Utilities.Serialization;
 using N17Solutions.Microphobia.Websockets.Hubs;
@@ -91,6 +92,7 @@ namespace N17Solutions.Microphobia.Tests
 
         private readonly Mock<IDataProvider> _dataProviderMock = new Mock<IDataProvider>();
         private readonly Mock<ILoggerFactory> _loggerFactoryMock = new Mock<ILoggerFactory>();
+        private readonly MicrophobiaConfiguration _configuration;
         private readonly Client _sut;
 
         public ClientTests()
@@ -102,9 +104,11 @@ namespace N17Solutions.Microphobia.Tests
             hubClientsMock.SetupGet(x => x.All).Returns(clientsProxyMock.Object);
             var hubContextMock = new Mock<IHubContext<MicrophobiaHub>>();
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
-            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);            
+            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);  
             
-            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock), new MicrophobiaConfiguration(microphobiaContextMock), _loggerFactoryMock.Object);
+            _configuration = new MicrophobiaConfiguration(microphobiaContextMock);
+            
+            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock, _configuration), _configuration, _loggerFactoryMock.Object);
         }
 
         [Fact]
@@ -252,6 +256,49 @@ namespace N17Solutions.Microphobia.Tests
             
             // Assert
             File.Exists("TEST.txt").ShouldBeTrue();
+        }
+
+        [Fact]
+        public void Should_Run_With_ScopedServiceFactory()
+        {
+            // Arrange
+            var instanceRetrieved = false;
+            object ServiceFactory(Type type)
+            {
+                instanceRetrieved = true;
+                return new TestOperations();
+            }
+            
+            Expression<Action<TestOperations>> expression = to => to.Runner();
+            var taskInfo = expression.ToTaskInfo();
+            _configuration.ScopedServiceFactories.TryAdd(taskInfo.Id, ServiceFactory);
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(taskInfo);
+
+            // Act
+            _sut.Start();
+            Thread.Sleep(10000);
+            
+            // Assert
+            instanceRetrieved.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void Should_Clear_ScopedServiceFactory()
+        {
+            // Arrange
+            object ServiceFactory(Type type) => new TestOperations();
+
+            Expression<Action<TestOperations>> expression = to => to.Runner();
+            var taskInfo = expression.ToTaskInfo();
+            _configuration.ScopedServiceFactories.TryAdd(taskInfo.Id, ServiceFactory);
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(taskInfo);
+
+            // Act
+            _sut.Start();
+            Thread.Sleep(10000);
+
+            // Assert
+            _configuration.ScopedServiceFactories.ContainsKey(taskInfo.Id).ShouldBeFalse();
         }
 
         public void Dispose()

@@ -4,10 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
+using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using N17Solutions.Microphobia.Websockets.Hubs;
+using Shouldly;
 using Xunit;
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable UnusedMethodReturnValue.Local
@@ -24,6 +26,7 @@ namespace N17Solutions.Microphobia.Tests
             public string ResultWithArgumentMethod(string arg) => $"Result With Argument Method: {arg}";
         }
 
+        private readonly MicrophobiaConfiguration _configuration;
         private readonly Mock<IDataProvider> _dataProviderMock = new Mock<IDataProvider>();
         private readonly Queue _sut;
 
@@ -38,7 +41,9 @@ namespace N17Solutions.Microphobia.Tests
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
             var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);
             
-            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock);
+            _configuration = new MicrophobiaConfiguration(microphobiaContextMock);
+            
+            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock, _configuration);
         }
 
         [Fact]
@@ -96,6 +101,20 @@ namespace N17Solutions.Microphobia.Tests
                                                                             && expression.ToTaskInfo().ReturnType == info.ReturnType
                                                                             && expression.ToTaskInfo().Arguments.Length == info.Arguments.Length),
                 It.IsAny<CancellationToken>()), Times.Once());
+        }
+        
+        [Fact]
+        public async Task Enqueues_Task_With_ScopedServiceFactory_Properly()
+        {
+            // Arrange
+            object ServiceFactory(Type type) => new TestOperator();
+            Expression<Action<TestOperator>> expression = x => x.ResultMethod();
+            
+            // Act
+            await _sut.Enqueue(expression, ServiceFactory).ConfigureAwait(false);
+            
+            // Assert
+            _configuration.ScopedServiceFactories.Count.ShouldBeGreaterThan(0);
         }
 
         [Fact]

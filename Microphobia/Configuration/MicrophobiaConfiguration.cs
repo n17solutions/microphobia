@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System;
+using System.Collections.Concurrent;
 using N17Solutions.Microphobia.ServiceContract.Enums;
 using N17Solutions.Microphobia.ServiceResolution;
 using N17Solutions.Microphobia.Websockets.Hubs;
@@ -20,7 +21,9 @@ namespace N17Solutions.Microphobia.Configuration
         public Storage StorageType { get; set; }
         
         public ServiceFactory ServiceFactory { get; set; }
-
+        
+        public ConcurrentDictionary<Guid, ServiceFactory> ScopedServiceFactories { get; set; } = new ConcurrentDictionary<Guid, ServiceFactory>();
+        
         public bool IsRunning
         {
             get => _isRunning;
