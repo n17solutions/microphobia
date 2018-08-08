@@ -5,12 +5,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.Utilities.Extensions;
+using N17Solutions.Microphobia.Utilities.Serialization;
 using N17Solutions.Microphobia.Websockets.Hubs;
 using Shouldly;
 using Xunit;
@@ -65,6 +67,24 @@ namespace N17Solutions.Microphobia.Tests
                 {
                     var info = new UTF8Encoding(true).GetBytes(argument.ToString());
                     fs.Write(info, 0, info.Length);
+                }
+            }
+
+            public async Task FileCreatorWithMultipleGuidArguments(Guid argument1, Guid argument2)
+            {
+                using (var fs = File.Create("TEST.txt"))
+                {
+                    var info = new UTF8Encoding(true).GetBytes($"{argument1} - {argument2}");
+                    await fs.WriteAsync(info, 0, info.Length);
+                }
+            }
+            
+            public async Task FileCreatorWithMultipleBoolArguments(bool argument1, bool argument2)
+            {
+                using (var fs = File.Create("TEST.txt"))
+                {
+                    var info = new UTF8Encoding(true).GetBytes($"{argument1} - {argument2}");
+                    await fs.WriteAsync(info, 0, info.Length);
                 }
             }
         }
@@ -184,6 +204,52 @@ namespace N17Solutions.Microphobia.Tests
             _sut.Start();
             Thread.Sleep(10000);
 
+            // Assert
+            File.Exists("TEST.txt").ShouldBeTrue();
+        }
+
+        [Fact]
+        [Trait("Reason", "Found errors in the wild.")]
+        public void Should_Deserialise_Multiple_Guids_Properly()
+        {
+            // Arrange
+            var guid1 = Guid.NewGuid();
+            var guid2 = Guid.NewGuid();
+            File.Delete("TEST.txt");
+            Expression<Action<TestOperations>> expression = to => to.FileCreatorWithMultipleGuidArguments(guid1, guid2);
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(() =>
+            {
+                var json = TaskInfoSerialization.Serialize(expression.ToTaskInfo());
+                return TaskInfoSerialization.Deserialize(json);
+            });
+            
+            // Act
+            _sut.Start();
+            Thread.Sleep(10000);
+            
+            // Assert
+            File.Exists("TEST.txt").ShouldBeTrue();
+        }
+        
+        [Fact]
+        [Trait("Reason", "Found errors in the wild.")]
+        public void Should_Deserialise_Multiple_Bool_Properly()
+        {
+            // Arrange
+            const bool bool1 = false;
+            const bool bool2 = true;
+            File.Delete("TEST.txt");
+            Expression<Action<TestOperations>> expression = to => to.FileCreatorWithMultipleBoolArguments(bool1, bool2);
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(() =>
+            {
+                var json = TaskInfoSerialization.Serialize(expression.ToTaskInfo());
+                return TaskInfoSerialization.Deserialize(json);
+            });
+            
+            // Act
+            _sut.Start();
+            Thread.Sleep(10000);
+            
             // Assert
             File.Exists("TEST.txt").ShouldBeTrue();
         }

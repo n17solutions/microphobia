@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design.Serialization;
 using Newtonsoft.Json;
 
 namespace N17Solutions.Microphobia.ServiceContract.Serialization
@@ -6,11 +7,12 @@ namespace N17Solutions.Microphobia.ServiceContract.Serialization
     public class JsonPrimitiveConverter : JsonConverter
     {
         public override bool CanRead => false;
-        public override bool CanConvert(Type objectType) => objectType.IsPrimitive;
+        public override bool CanConvert(Type objectType) => objectType.IsPrimitive || objectType.IsAssignableFrom(typeof(Guid));
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            //return objectType.IsAssignableFrom(typeof(Guid)) ? serializer.Deserialize<Guid>(reader) : existingValue;
+            return serializer.Deserialize(reader, objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
