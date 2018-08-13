@@ -30,7 +30,8 @@ namespace N17Solutions.Microphobia.Dashboard
             
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaConfiguration>());
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaHubContext>());
-            services.AddTransient(_ => serviceProvider.GetRequiredService<IDataProvider>());            
+            services.AddTransient(_ => serviceProvider.GetRequiredService<IDataProvider>());
+            services.AddSingleton(_ => serviceProvider.GetRequiredService<Client>());
         }
     }
 }

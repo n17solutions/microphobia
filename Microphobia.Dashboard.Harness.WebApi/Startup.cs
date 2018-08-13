@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using N17Solutions.Microphobia;
 using N17Solutions.Microphobia.Dashboard;
 using N17Solutions.Microphobia.Extensions;
 using N17Solutions.Microphobia.Postgres.Extensions;
-using N17Solutions.Microphobia.ServiceContract.Providers;
 
 namespace Microphobia.Dashboard.Harness.WebApi
 {

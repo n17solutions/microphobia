@@ -30,6 +30,10 @@ header h2 {
     margin-top: 0.5em;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .swimlanes {
     display: flex;
     flex-direction: column;

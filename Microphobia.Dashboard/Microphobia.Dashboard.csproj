@@ -1,62 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="BuildWebApp">
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyName>N17Solutions.Microphobia.Dashboard</AssemblyName>
-        <RootNamespace>N17Solutions.Microphobia.Dashboard</RootNamespace>
-        <SpaRoot>wwwroot\</SpaRoot>
-        <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    </PropertyGroup>
-    
-    <PropertyGroup>
-        <PackageId>N17Solutions.Microphobia.Dashboard</PackageId>
-        <Authors>James Woodley</Authors>
-        <Company>N17 Solutions</Company>
-        <Title>Microphobia Dashboard</Title>
-        <Description>UI allowing exposure to the current state of the Microphobia instance.</Description>
-        <PackageTags>n17solutions;micro;phobia;microphobia;long running process;background process;ui;dashboard</PackageTags>
-        <Version>1.0.0</Version>
-        <PackageVersion>1.0.0</PackageVersion>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
-        <InformationalVersion>1.0.0</InformationalVersion>
-        <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
-        <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <!-- Don't publish the SPA source files, but do show them in the project files list -->
-        <Content Remove="$(SpaRoot)**" />
-        <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
-        <EmbeddedResource Include="$(SpaRoot)build/**" Exclude="@(EmbeddedResource)" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <PackageReference Include="Humanizer" Version="2.4.2" />
-        <PackageReference Include="Microsoft.AspNetCore" Version="2.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.2" />
-        <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
-        <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <ProjectReference Include="..\Microphobia\Microphobia.csproj" />
-    </ItemGroup>
-    
-    <Target Name="BuildWebApp">
-        <Exec Command="node --version" ContinueOnError="true">
-            <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
-        </Exec>
-        <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run the WebApp. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt, terminal or IDE." />
-        
-        <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-        
-        <Message Importance="high" Text="Building WebApp..." />
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />        
-    </Target>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>N17Solutions.Microphobia.Dashboard</AssemblyName>
+    <RootNamespace>N17Solutions.Microphobia.Dashboard</RootNamespace>
+    <SpaRoot>wwwroot\</SpaRoot>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>N17Solutions.Microphobia.Dashboard</PackageId>
+    <Authors>James Woodley</Authors>
+    <Company>N17 Solutions</Company>
+    <Title>Microphobia Dashboard</Title>
+    <Description>UI allowing exposure to the current state of the Microphobia instance.</Description>
+    <PackageTags>n17solutions;micro;phobia;microphobia;long running process;background process;ui;dashboard</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0</PackageVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Content Remove="$(SpaRoot)**" />
+    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+    <EmbeddedResource Include="$(SpaRoot)build/**" Exclude="@(EmbeddedResource)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Humanizer" Version="2.4.2" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microphobia\Microphobia.csproj" />
+  </ItemGroup>
+  <Target Name="BuildWebApp">
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run the WebApp. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt, terminal or IDE." />
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Message Importance="high" Text="Building WebApp..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+  </Target>
 </Project>

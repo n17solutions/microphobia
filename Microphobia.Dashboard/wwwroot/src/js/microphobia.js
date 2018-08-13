@@ -128,6 +128,12 @@ const vm = new Vue({
         hideTaskModal: function () {
             this.currentTask = {};
             this.openTaskModal = false;
+        },
+        toggleSystemStatus: function () {
+            if (this.systemStatus === SYSTEM_STATUS_STOPPED)
+                axios.put('./api/systemstatus/start');
+            else
+                axios.put('./api/systemstatus/stop')
         }
     }
 });

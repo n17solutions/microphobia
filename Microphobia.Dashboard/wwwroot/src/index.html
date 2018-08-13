@@ -21,7 +21,7 @@
                 <h3>
                     Current System Status:
                     {{ systemStatus }}
-                    <i class="fas" :class="systemStatus === 'Stopped' ? 'fa-ban' : 'fa-play-circle'"></i>
+                    <i v-on:click="toggleSystemStatus()" class="fas pointer" :class="systemStatus === 'Stopped' ? 'fa-ban' : 'fa-play-circle'"></i>
                 </h3>
             </header>
         
