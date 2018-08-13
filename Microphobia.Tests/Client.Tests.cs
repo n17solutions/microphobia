@@ -55,7 +55,7 @@ namespace N17Solutions.Microphobia.Tests
 
             public void FileCreator()
             {
-                using (var fs = File.Create("TEST.txt"))
+                using (var fs = File.Create($"TEST.txt"))
                 {
                     var info = new UTF8Encoding(true).GetBytes(DateTime.UtcNow.ToShortDateString());
                     fs.Write(info, 0, info.Length);
@@ -64,7 +64,8 @@ namespace N17Solutions.Microphobia.Tests
 
             public void FileCreatorWithGuidArgument(Guid argument)
             {
-                using (var fs = File.Create("TEST.txt"))
+                var filename = $"TEST_{argument}.txt";
+                using (var fs = File.Create(filename))
                 {
                     var info = new UTF8Encoding(true).GetBytes(argument.ToString());
                     fs.Write(info, 0, info.Length);
@@ -73,7 +74,9 @@ namespace N17Solutions.Microphobia.Tests
 
             public async Task FileCreatorWithMultipleGuidArguments(Guid argument1, Guid argument2)
             {
-                using (var fs = File.Create("TEST.txt"))
+                var filename = $"TEST_{argument1}_{argument2}.txt";
+                
+                using (var fs = File.Create(filename))
                 {
                     var info = new UTF8Encoding(true).GetBytes($"{argument1} - {argument2}");
                     await fs.WriteAsync(info, 0, info.Length);
@@ -82,7 +85,9 @@ namespace N17Solutions.Microphobia.Tests
             
             public async Task FileCreatorWithMultipleBoolArguments(bool argument1, bool argument2)
             {
-                using (var fs = File.Create("TEST.txt"))
+                var filename = $"TEST_{argument1}_{argument2}.txt";
+                
+                using (var fs = File.Create(filename))
                 {
                     var info = new UTF8Encoding(true).GetBytes($"{argument1} - {argument2}");
                     await fs.WriteAsync(info, 0, info.Length);
@@ -143,7 +148,7 @@ namespace N17Solutions.Microphobia.Tests
 
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
 
             // Assert
             ClientLogger.Logs.FirstOrDefault(x => x.Contains("Log Level: Error")).ShouldNotBeNull();
@@ -158,7 +163,7 @@ namespace N17Solutions.Microphobia.Tests
 
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
 
             // Assert
             ClientLogger.Logs.FirstOrDefault(x => x.Contains("Task Started") && x.Contains(nameof(TestOperations.Runner))).ShouldNotBeNull();
@@ -173,7 +178,7 @@ namespace N17Solutions.Microphobia.Tests
 
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
 
             // Assert
             ClientLogger.Logs.FirstOrDefault(x => x.Contains("Task Finished Processing") && x.Contains(nameof(TestOperations.Runner))).ShouldNotBeNull();
@@ -189,7 +194,7 @@ namespace N17Solutions.Microphobia.Tests
  
              // Act
              _sut.Start();
-             Thread.Sleep(10000);
+             Thread.Sleep(1000);
  
              // Assert
              File.Exists("TEST.txt").ShouldBeTrue();
@@ -200,16 +205,18 @@ namespace N17Solutions.Microphobia.Tests
         {
             // Arrange
             var guid = Guid.NewGuid();
-            File.Delete("TEST.txt");
+            var filename = $"TEST_{guid}.txt";
+            
+            File.Delete(filename);
             Expression<Action<TestOperations>> expression = to => to.FileCreatorWithGuidArgument(guid);
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
 
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
 
             // Assert
-            File.Exists("TEST.txt").ShouldBeTrue();
+            File.Exists(filename).ShouldBeTrue();
         }
 
         [Fact]
@@ -219,7 +226,9 @@ namespace N17Solutions.Microphobia.Tests
             // Arrange
             var guid1 = Guid.NewGuid();
             var guid2 = Guid.NewGuid();
-            File.Delete("TEST.txt");
+            var filename = $"TEST_{guid1}_{guid2}.txt";
+            
+            File.Delete(filename);
             Expression<Action<TestOperations>> expression = to => to.FileCreatorWithMultipleGuidArguments(guid1, guid2);
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(() =>
             {
@@ -229,10 +238,10 @@ namespace N17Solutions.Microphobia.Tests
             
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
             
             // Assert
-            File.Exists("TEST.txt").ShouldBeTrue();
+            File.Exists(filename).ShouldBeTrue();
         }
         
         [Fact]
@@ -242,7 +251,11 @@ namespace N17Solutions.Microphobia.Tests
             // Arrange
             const bool bool1 = false;
             const bool bool2 = true;
-            File.Delete("TEST.txt");
+            
+            var filename = $"TEST_{bool1}_{bool2}.txt";
+            
+            File.Delete(filename);
+            
             Expression<Action<TestOperations>> expression = to => to.FileCreatorWithMultipleBoolArguments(bool1, bool2);
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(() =>
             {
@@ -252,10 +265,10 @@ namespace N17Solutions.Microphobia.Tests
             
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
             
             // Assert
-            File.Exists("TEST.txt").ShouldBeTrue();
+            File.Exists(filename).ShouldBeTrue();
         }
 
         [Fact]
@@ -276,7 +289,7 @@ namespace N17Solutions.Microphobia.Tests
 
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
             
             // Assert
             instanceRetrieved.ShouldBeTrue();
@@ -295,7 +308,7 @@ namespace N17Solutions.Microphobia.Tests
 
             // Act
             _sut.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
 
             // Assert
             _configuration.ScopedServiceFactories.ContainsKey(taskInfo.Id).ShouldBeFalse();
