@@ -24,6 +24,7 @@ namespace N17Solutions.Microphobia.Tests
             public void VoidMethod() => Console.WriteLine("Void Method");
             public string ResultMethod() => "Result Method";
             public string ResultWithArgumentMethod(string arg) => $"Result With Argument Method: {arg}";
+            public async Task TaskMethod() => await Task.Run(() => Console.WriteLine("Task Method")).ConfigureAwait(false);
         }
 
         private readonly MicrophobiaConfiguration _configuration;
@@ -125,6 +126,16 @@ namespace N17Solutions.Microphobia.Tests
 
             // Assert
             _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => info.Status.Equals(TaskStatus.Created)), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task Enqueues_Async_Task_Properly()
+        {
+            // Act
+            await _sut.Enqueue<TestOperator>(x => x.TaskMethod()).ConfigureAwait(false);
+            
+            // Assert
+            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => info.Status.Equals(TaskStatus.Created) && info.IsAsync), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]

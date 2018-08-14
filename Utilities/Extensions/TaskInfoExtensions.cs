@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using N17Solutions.Microphobia.ServiceContract.Exceptions;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceResolution;
@@ -8,7 +9,7 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
 {
     public static class TaskInfoExtensions
     {
-        public static object Execute(this TaskInfo taskInfo, ServiceFactory serviceFactory = null)
+        public static void Execute(this TaskInfo taskInfo, ServiceFactory serviceFactory = null)
         {
             var assembly = Assembly.Load(taskInfo.AssemblyName);
             var type = assembly.GetType(taskInfo.TypeName);
@@ -18,7 +19,7 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
             
             var staticMethod = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             if (staticMethod != null)
-                return staticMethod.Invoke(null, args);
+                staticMethod.Invoke(null, args);
 
             var instanceMethod = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (instanceMethod == null)
@@ -31,7 +32,37 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
             if (instance == null)
                 throw new InvalidOperationException($"Cannot execute method {methodName} on type {type} as it cannot be resolved. Have you made sure to add it to your Dependency Injection?");
             
-            return instanceMethod.Invoke(instance, args);
+            instanceMethod.Invoke(instance, args);
+        }
+
+        public static async Task ExecuteAsync(this TaskInfo taskInfo, ServiceFactory serviceFactory = null)
+        {
+            var assembly = Assembly.Load(taskInfo.AssemblyName);
+            var type = assembly.GetType(taskInfo.TypeName);
+
+            var methodName = taskInfo.MethodName;
+            var args = taskInfo.Arguments;
+
+            var staticMethod = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            if (staticMethod != null)
+            {
+                var staticResult = (Task) staticMethod.Invoke(null, args);
+                await staticResult;
+            }
+
+            var instanceMethod = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (instanceMethod == null)
+                throw new UnableToDeserializeDelegateException();
+
+            var instance = serviceFactory != null
+                ? serviceFactory(type)
+                : Activator.CreateInstance(type);
+            
+            if (instance == null)
+                throw new InvalidOperationException($"Cannot execute method {methodName} on type {type} as it cannot be resolved. Have you made sure to add it to your Dependency Injection?");
+
+            var result = (Task) instanceMethod.Invoke(instance, args);
+            await result;
         }
     }
 }

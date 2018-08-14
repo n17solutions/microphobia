@@ -63,7 +63,10 @@ namespace N17Solutions.Microphobia
                                 ? _config.ScopedServiceFactories[nextTask.Id]
                                 : _config.ServiceFactory;
                             
-                            nextTask.Execute(serviceFactory);
+                            if (nextTask.IsAsync)
+                                await nextTask.ExecuteAsync(serviceFactory);
+                            else
+                                nextTask.Execute(serviceFactory);
 
                             stopwatch.Stop();
                             await LogTaskCompleted(nextTask, stopwatch.Elapsed).ConfigureAwait(false);
@@ -75,10 +78,6 @@ namespace N17Solutions.Microphobia
                         {
                             await LogTaskException(nextTask, e).ConfigureAwait(false);
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No Task to Dequeue.");
                     }
 
                     Thread.Sleep(_config.PollIntervalMs);

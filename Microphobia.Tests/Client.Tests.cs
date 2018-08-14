@@ -72,25 +72,34 @@ namespace N17Solutions.Microphobia.Tests
                 }
             }
 
-            public async Task FileCreatorWithMultipleGuidArguments(Guid argument1, Guid argument2)
+            public void FileCreatorWithMultipleGuidArguments(Guid argument1, Guid argument2)
             {
                 var filename = $"TEST_{argument1}_{argument2}.txt";
                 
                 using (var fs = File.Create(filename))
                 {
                     var info = new UTF8Encoding(true).GetBytes($"{argument1} - {argument2}");
-                    await fs.WriteAsync(info, 0, info.Length);
+                    fs.Write(info, 0, info.Length);
                 }
             }
             
-            public async Task FileCreatorWithMultipleBoolArguments(bool argument1, bool argument2)
+            public void FileCreatorWithMultipleBoolArguments(bool argument1, bool argument2)
             {
                 var filename = $"TEST_{argument1}_{argument2}.txt";
                 
                 using (var fs = File.Create(filename))
                 {
                     var info = new UTF8Encoding(true).GetBytes($"{argument1} - {argument2}");
-                    await fs.WriteAsync(info, 0, info.Length);
+                    fs.Write(info, 0, info.Length);
+                }
+            }
+
+            public async Task FileCreatorAsync()
+            {
+                using (var fs = File.Create("TEST.async.txt"))
+                {
+                    var info = new UTF8Encoding(true).GetBytes(DateTime.UtcNow.ToLongDateString());
+                    await fs.WriteAsync(info, 0, info.Length).ConfigureAwait(false);
                 }
             }
         }
@@ -220,6 +229,22 @@ namespace N17Solutions.Microphobia.Tests
         }
 
         [Fact]
+        public void Should_Perform_Asynchronous_Task()
+        {
+            // Arrange
+            File.Delete("TEST.async.txt");
+            Expression<Action<TestOperations>> expression = to => to.FileCreatorAsync();
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
+            
+            // Act
+            _sut.Start();
+            Thread.Sleep(1000);
+            
+            // Assert
+            File.Exists("TEST.async.txt").ShouldBeTrue();
+        }
+
+        [Fact]
         [Trait("Reason", "Found errors in the wild.")]
         public void Should_Deserialise_Multiple_Guids_Properly()
         {
@@ -272,7 +297,7 @@ namespace N17Solutions.Microphobia.Tests
             // Assert
             File.Exists(filename).ShouldBeTrue();
         }
-
+        
         [Fact]
         public void Should_Run_With_ScopedServiceFactory()
         {

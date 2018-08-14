@@ -44,6 +44,11 @@ namespace N17Solutions.Microphobia.Domain.Tasks
         /// A serialised representation of this Task
         /// </summary>
         public string Data { get; set; }
+        
+        /// <summary>
+        /// Whether the Task is asynchronous or not.
+        /// </summary>
+        public bool IsAsync { get; set; }
 
         /// <summary>
         /// Transforms the <see cref="Data" /> property of a <see cref="TaskInfo" /> domain model into a <see cref="ServiceContract.Models.TaskInfo" />
@@ -68,6 +73,7 @@ namespace N17Solutions.Microphobia.Domain.Tasks
             DateCreated = response.DateCreated;
             DateLastUpdated = response.DateLastUpdated;
             FailureDetails = response.FailureDetails;
+            IsAsync = response.IsAsync;
             Data = TaskInfoSerialization.Serialize(response);
         }
 
@@ -86,7 +92,8 @@ namespace N17Solutions.Microphobia.Domain.Tasks
                 MethodName = response.MethodName,
                 ReturnType = response.ReturnType.FullName,
                 Status = response.Status,
-                FailureDetails = response.FailureDetails
+                FailureDetails = response.FailureDetails,
+                IsAsync = response.IsAsync
             };
 
             // Why don't we do this in the object initializer?
