@@ -39,20 +39,6 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
 
         public async Task<TaskInfo> Dequeue(CancellationToken cancellationToken = default(CancellationToken))
         {
-            /*var domainObject = await _context.Tasks
-                .Where(task => task.Status.Equals(TaskStatus.Created))
-                .OrderBy(task => task.DateLastUpdated)
-                .ThenBy(task => task.DateCreated)
-                .FirstOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            if (domainObject == null)
-                return null;
-
-            domainObject.Status = TaskStatus.WaitingToRun;
-            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-            return domainObject.ToTaskInfoResponse();*/
             var task = await _context.Tasks
                 .Where(t => t.Status == TaskStatus.Created)
                 .OrderBy(t => t.DateLastUpdated)
@@ -66,8 +52,6 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
 
         public async Task<TaskInfo> GetTaskInfo(Guid taskId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            /*var domainObject = await _context.Tasks.FirstOrDefaultAsync(task => task.ResourceId.Equals(taskId), cancellationToken).ConfigureAwait(false);
-            return domainObject.ToTaskInfoResponse();*/
             var task = await _context.Tasks
                 .Where(t => t.ResourceId == taskId)
                 .Select(TaskInfoExpressions.ToTaskInfoResponse)

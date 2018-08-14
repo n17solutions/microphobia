@@ -229,7 +229,9 @@ namespace N17Solutions.Microphobia.Tests
             var filename = $"TEST_{guid1}_{guid2}.txt";
             
             File.Delete(filename);
+            
             Expression<Action<TestOperations>> expression = to => to.FileCreatorWithMultipleGuidArguments(guid1, guid2);
+            
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(() =>
             {
                 var json = TaskInfoSerialization.Serialize(expression.ToTaskInfo());

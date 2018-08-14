@@ -46,8 +46,11 @@ namespace N17Solutions.Microphobia
                     }
 
                     var nextTask = await _queue.Dequeue().ConfigureAwait(false);
+                    
                     if (nextTask != null)
                     {
+                        Console.WriteLine($"Dequeued Task: {nextTask.Id}");
+                        
                         var hasScopedServiceFactory = _config.ScopedServiceFactories.ContainsKey(nextTask.Id);
                         await LogTaskStarted(nextTask).ConfigureAwait(false);
 
@@ -72,6 +75,10 @@ namespace N17Solutions.Microphobia
                         {
                             await LogTaskException(nextTask, e).ConfigureAwait(false);
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No Task to Dequeue.");
                     }
 
                     Thread.Sleep(_config.PollIntervalMs);
