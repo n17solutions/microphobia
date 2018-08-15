@@ -7,12 +7,10 @@ namespace N17Solutions.Microphobia.Postgres
 {
     public static class Bootstrapper
     {
-        public static IServiceCollection Strap(string connectionString, Action<IServiceCollection> serviceCollectionAction = null, ServiceFactory serviceFactory = null)
+        public static IServiceCollection Strap(string connectionString, ServiceFactory serviceFactory = null)
         {
             var microphobiaServices = new ServiceCollection();
             microphobiaServices.AddMicrophobiaPostgresStorage(connectionString, serviceFactory);
-
-            serviceCollectionAction?.Invoke(microphobiaServices);
 
             return microphobiaServices;
         }
