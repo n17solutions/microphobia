@@ -12,7 +12,7 @@ namespace N17Solutions.Microphobia.Extensions
             
             return services
                 .AddSingleton(serviceProvider => new MicrophobiaHubContext(serviceProvider.GetRequiredService<IHubContext<MicrophobiaHub>>()))
-                .AddTransient<Queue>()
+                .AddSingleton<Queue>()
                 .AddSingleton<Client>();
         }
     }
