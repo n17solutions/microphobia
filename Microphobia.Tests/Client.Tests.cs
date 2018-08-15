@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
@@ -296,49 +295,6 @@ namespace N17Solutions.Microphobia.Tests
             
             // Assert
             File.Exists(filename).ShouldBeTrue();
-        }
-        
-        [Fact]
-        public void Should_Run_With_ScopedServiceFactory()
-        {
-            // Arrange
-            var instanceRetrieved = false;
-            object ServiceFactory(Type type)
-            {
-                instanceRetrieved = true;
-                return new TestOperations();
-            }
-            
-            Expression<Action<TestOperations>> expression = to => to.Runner();
-            var taskInfo = expression.ToTaskInfo();
-            _configuration.ScopedServiceFactories.TryAdd(taskInfo.Id, ServiceFactory);
-            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(taskInfo);
-
-            // Act
-            _sut.Start();
-            Thread.Sleep(1000);
-            
-            // Assert
-            instanceRetrieved.ShouldBeTrue();
-        }
-
-        [Fact]
-        public void Should_Clear_ScopedServiceFactory()
-        {
-            // Arrange
-            object ServiceFactory(Type type) => new TestOperations();
-
-            Expression<Action<TestOperations>> expression = to => to.Runner();
-            var taskInfo = expression.ToTaskInfo();
-            _configuration.ScopedServiceFactories.TryAdd(taskInfo.Id, ServiceFactory);
-            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(taskInfo);
-
-            // Act
-            _sut.Start();
-            Thread.Sleep(1000);
-
-            // Assert
-            _configuration.ScopedServiceFactories.ContainsKey(taskInfo.Id).ShouldBeFalse();
         }
 
         public void Dispose()

@@ -9,7 +9,6 @@ using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 using N17Solutions.Microphobia.Utilities.Extensions;
-using Shouldly;
 using Xunit;
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable UnusedMethodReturnValue.Local
@@ -27,7 +26,6 @@ namespace N17Solutions.Microphobia.Tests
             public async Task TaskMethod() => await Task.Run(() => Console.WriteLine("Task Method")).ConfigureAwait(false);
         }
 
-        private readonly MicrophobiaConfiguration _configuration;
         private readonly Mock<IDataProvider> _dataProviderMock = new Mock<IDataProvider>();
         private readonly Queue _sut;
 
@@ -42,9 +40,9 @@ namespace N17Solutions.Microphobia.Tests
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
             var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);
             
-            _configuration = new MicrophobiaConfiguration(microphobiaContextMock);
+            var configuration = new MicrophobiaConfiguration(microphobiaContextMock);
             
-            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock, _configuration);
+            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock, configuration);
         }
 
         [Fact]
@@ -104,20 +102,6 @@ namespace N17Solutions.Microphobia.Tests
                 It.IsAny<CancellationToken>()), Times.Once());
         }
         
-        [Fact]
-        public async Task Enqueues_Task_With_ScopedServiceFactory_Properly()
-        {
-            // Arrange
-            object ServiceFactory(Type type) => new TestOperator();
-            Expression<Action<TestOperator>> expression = x => x.ResultMethod();
-            
-            // Act
-            await _sut.Enqueue(expression, ServiceFactory).ConfigureAwait(false);
-            
-            // Assert
-            _configuration.ScopedServiceFactories.Count.ShouldBeGreaterThan(0);
-        }
-
         [Fact]
         public async Task Enqueues_Task_With_Created_Status()
         {

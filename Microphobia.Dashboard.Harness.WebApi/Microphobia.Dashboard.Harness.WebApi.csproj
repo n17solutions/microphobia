@@ -5,6 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="StructureMap">
+      <Version>4.7.0</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microphobia.Dashboard\Microphobia.Dashboard.csproj" />

@@ -6,7 +6,6 @@ using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
-using N17Solutions.Microphobia.ServiceResolution;
 using N17Solutions.Microphobia.Utilities.Extensions;
 
 namespace N17Solutions.Microphobia
@@ -24,16 +23,16 @@ namespace N17Solutions.Microphobia
             _config = config;
         }
 
-        public Task Enqueue(Expression<Action> expression, ServiceFactory scopedServiceFactory = null)
+        public Task Enqueue(Expression<Action> expression)
         {
             var taskInfo = expression.ToTaskInfo();
-            return Enqueue(taskInfo, scopedServiceFactory);
+            return Enqueue(taskInfo);
         }
 
-        public Task Enqueue<TExecutor>(Expression<Action<TExecutor>> expression, ServiceFactory scopedServiceFactory = null)
+        public Task Enqueue<TExecutor>(Expression<Action<TExecutor>> expression)
         {
             var taskInfo = expression.ToTaskInfo();
-            return Enqueue(taskInfo, scopedServiceFactory);
+            return Enqueue(taskInfo);
         }
         
         public async Task<TaskInfo> Dequeue()
@@ -85,11 +84,8 @@ namespace N17Solutions.Microphobia
             }
         }
         
-        private Task Enqueue(TaskInfo taskInfo, ServiceFactory scopedServiceFactory = null)
+        private Task Enqueue(TaskInfo taskInfo)
         {
-            if (scopedServiceFactory != null)
-                _config.ScopedServiceFactories.AddOrUpdate(taskInfo.Id, scopedServiceFactory, (guid, factory) => scopedServiceFactory);
-            
             taskInfo.Status = TaskStatus.Created;
             return Task.WhenAll(_dataProvider.Enqueue(taskInfo), _taskHubContext.RefreshTasks());
         }

@@ -58,7 +58,6 @@ namespace N17Solutions.Microphobia
                     {
                         Console.WriteLine($"Dequeued Task: {nextTask.Id}");
 
-                        var hasScopedServiceFactory = _config.ScopedServiceFactories.ContainsKey(nextTask.Id);
                         await LogTaskStarted(nextTask).ConfigureAwait(false);
 
                         try
@@ -66,20 +65,13 @@ namespace N17Solutions.Microphobia
                             var stopwatch = new Stopwatch();
                             stopwatch.Start();
 
-                            var serviceFactory = hasScopedServiceFactory
-                                ? _config.ScopedServiceFactories[nextTask.Id]
-                                : _config.ServiceFactory;
-
                             if (nextTask.IsAsync)
-                                await nextTask.ExecuteAsync(serviceFactory);
+                                await nextTask.ExecuteAsync(_config.ServiceFactory);
                             else
-                                nextTask.Execute(serviceFactory);
+                                nextTask.Execute(_config.ServiceFactory);
 
                             stopwatch.Stop();
                             await LogTaskCompleted(nextTask, stopwatch.Elapsed).ConfigureAwait(false);
-
-                            if (hasScopedServiceFactory)
-                                _config.ScopedServiceFactories.TryRemove(nextTask.Id, out var _);
                         }
                         catch (Exception e)
                         {

@@ -22,8 +22,6 @@ namespace N17Solutions.Microphobia.ServiceContract.Configuration
         
         public ServiceFactory ServiceFactory { get; set; }
         
-        public ConcurrentDictionary<Guid, ServiceFactory> ScopedServiceFactories { get; set; } = new ConcurrentDictionary<Guid, ServiceFactory>();
-        
         public bool IsRunning
         {
             get => _isRunning;
