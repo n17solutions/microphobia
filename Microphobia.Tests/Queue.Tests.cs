@@ -113,16 +113,6 @@ namespace N17Solutions.Microphobia.Tests
         }
 
         [Fact]
-        public async Task Enqueues_Async_Task_Properly()
-        {
-            // Act
-            await _sut.Enqueue<TestOperator>(x => x.TaskMethod()).ConfigureAwait(false);
-            
-            // Assert
-            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => info.Status.Equals(TaskStatus.Created) && info.IsAsync), It.IsAny<CancellationToken>()), Times.Once());
-        }
-
-        [Fact]
         public async Task Dequeues_Task_Properly()
         {
             // Act

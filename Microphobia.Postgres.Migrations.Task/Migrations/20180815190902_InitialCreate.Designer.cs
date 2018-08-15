@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace N17Solutions.Microphobia.Postgres.Migrations.Task.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    [Migration("20180815124922_InitialCreate")]
+    [Migration("20180815190902_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
