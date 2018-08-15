@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using N17Solutions.Microphobia.ServiceContract.Exceptions;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceResolution;
 
@@ -9,33 +9,7 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
 {
     public static class TaskInfoExtensions
     {
-        public static void Execute(this TaskInfo taskInfo, ServiceFactory serviceFactory = null)
-        {
-            var assembly = Assembly.Load(taskInfo.AssemblyName);
-            var type = assembly.GetType(taskInfo.TypeName);
-
-            var methodName = taskInfo.MethodName;
-            var args = taskInfo.Arguments;
-            
-            var staticMethod = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            if (staticMethod != null)
-                staticMethod.Invoke(null, args);
-
-            var instanceMethod = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (instanceMethod == null)
-                throw new UnableToDeserializeDelegateException();
-
-            var instance = serviceFactory != null
-                ? serviceFactory(type)
-                : Activator.CreateInstance(type);
-            
-            if (instance == null)
-                throw new InvalidOperationException($"Cannot execute method {methodName} on type {type} as it cannot be resolved. Have you made sure to add it to your Dependency Injection?");
-            
-            instanceMethod.Invoke(instance, args);
-        }
-
-        public static async Task ExecuteAsync(this TaskInfo taskInfo, ServiceFactory serviceFactory = null)
+        public static object Execute(this TaskInfo taskInfo, ServiceFactory serviceFactory = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var assembly = Assembly.Load(taskInfo.AssemblyName);
             var type = assembly.GetType(taskInfo.TypeName);
@@ -43,26 +17,42 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
             var methodName = taskInfo.MethodName;
             var args = taskInfo.Arguments;
 
-            var staticMethod = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            if (staticMethod != null)
+            object instance = null;
+            MethodInfo method;
+            method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            if (method == null)
             {
-                var staticResult = (Task) staticMethod.Invoke(null, args);
-                await staticResult;
+                instance = serviceFactory != null ? serviceFactory(type) : Activator.CreateInstance(type);
+                if (instance == null)
+                    throw new InvalidOperationException($"Cannot execute method {methodName} on type {type} as it cannot be resolved. Have you made sure to add it to your Dependency Injection?");
+
+                method = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             }
 
-            var instanceMethod = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (instanceMethod == null)
-                throw new UnableToDeserializeDelegateException();
+            var result = InvokeMethod(method, instance, args, cancellationToken);
+            return result;
+        }
 
-            var instance = serviceFactory != null
-                ? serviceFactory(type)
-                : Activator.CreateInstance(type);
+        private static object InvokeMethod(MethodInfo method, object instance, object[] arguments, CancellationToken cancellationToken)
+        {
+            var result = method.Invoke(instance, arguments);
+
+            if (!(result is Task task)) 
+                return result;
             
-            if (instance == null)
-                throw new InvalidOperationException($"Cannot execute method {methodName} on type {type} as it cannot be resolved. Have you made sure to add it to your Dependency Injection?");
+            task.Wait(cancellationToken);
 
-            var result = (Task) instanceMethod.Invoke(instance, args);
-            await result;
+            if (method.ReturnType.GetTypeInfo().IsGenericType)
+            {
+                var resultProperty = method.ReturnType.GetRuntimeProperty("Result");
+                result = resultProperty.GetValue(task);
+            }
+            else
+            {
+                result = null;
+            }
+
+            return result;
         }
     }
 }

@@ -9,8 +9,6 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
     {
         public static TaskInfo ToTaskInfo(this MethodInfo method, object[] arguments)
         {
-            var asyncAttributeType = typeof(AsyncStateMachineAttribute);
-            
             var taskInfo = new TaskInfo
             {
                 Id = Guid.NewGuid(),
@@ -18,8 +16,7 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
                 TypeName = method.DeclaringType?.FullName,
                 MethodName = method.Name,
                 Arguments = arguments,
-                ReturnType = method.ReturnType,
-                IsAsync = method.GetCustomAttribute(asyncAttributeType) != null
+                ReturnType = method.ReturnType
             };
 
             return taskInfo;

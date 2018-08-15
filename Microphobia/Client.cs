@@ -65,10 +65,7 @@ namespace N17Solutions.Microphobia
                             var stopwatch = new Stopwatch();
                             stopwatch.Start();
 
-                            if (nextTask.IsAsync)
-                                await nextTask.ExecuteAsync(_config.ServiceFactory);
-                            else
-                                nextTask.Execute(_config.ServiceFactory);
+                            nextTask.Execute(_config.ServiceFactory, _cancellationToken);
 
                             stopwatch.Stop();
                             await LogTaskCompleted(nextTask, stopwatch.Elapsed).ConfigureAwait(false);
