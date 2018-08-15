@@ -2,11 +2,16 @@
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using N17Solutions.Microphobia.Data.EntityFramework.Providers;
 using N17Solutions.Microphobia.Domain.Tasks;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Enums;
 using N17Solutions.Microphobia.ServiceContract.Providers;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using Shouldly;
 using Xunit;
@@ -28,9 +33,18 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
 
         public DataProviderTests()
         {
+            var clientsProxyMock = new Mock<IClientProxy>();
+            var hubClientsMock = new Mock<IHubClients>();
+            hubClientsMock.SetupGet(x => x.All).Returns(clientsProxyMock.Object);
+            var hubContextMock = new Mock<IHubContext<MicrophobiaHub>>();
+            hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
+            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);  
+            
             var dbOptions = new DbContextOptionsBuilder<TaskContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             _context = new TaskContext(dbOptions);
-            _sut = new DataProvider(_context);
+
+            var config = new MicrophobiaConfiguration(microphobiaContextMock);
+            _sut = new DataProvider(_context, config);
         }
 
         [Fact]
@@ -39,11 +53,11 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
             // Arrange
             Expression<Action<TestOperator>> expression1 = x => x.VoidMethod();
             Expression<Action<TestOperator>> expression2 = x => x.ResultMethod();
-            var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo());
+            var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo(), Storage.None);
             task1.DateCreated = DateTime.UtcNow;
             task1.DateLastUpdated = task1.DateCreated;
 
-            var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo());
+            var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo(), Storage.None);
             task2.DateCreated = DateTime.UtcNow;
             task2.DateLastUpdated = task2.DateCreated;
             await _context.Tasks.AddRangeAsync(task1, task2).ConfigureAwait(false);
@@ -62,11 +76,11 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
             // Arrange
             Expression<Action<TestOperator>> expression1 = x => x.VoidMethod();
             Expression<Action<TestOperator>> expression2 = x => x.ResultMethod();
-            var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo());
+            var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo(), Storage.None);
             task1.DateCreated = DateTime.UtcNow;
             task1.DateLastUpdated = task1.DateCreated;
 
-            var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo());
+            var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo(), Storage.None);
             task2.DateCreated = DateTime.UtcNow.AddMinutes(-5);
             task2.DateLastUpdated = DateTime.UtcNow.AddMinutes(-10);
             await _context.Tasks.AddRangeAsync(task1, task2).ConfigureAwait(false);
@@ -85,11 +99,11 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
             // Arrange
             Expression<Action<TestOperator>> expression1 = x => x.VoidMethod();
             Expression<Action<TestOperator>> expression2 = x => x.ResultMethod();
-            var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo());
+            var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo(), Storage.None);
             task1.DateCreated = DateTime.UtcNow;
             task1.DateLastUpdated = task1.DateCreated;
             
-            var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo());
+            var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo(), Storage.None);
             task2.Status = TaskStatus.Faulted;
             task2.DateCreated = DateTime.UtcNow.AddMinutes(-5);
             task2.DateLastUpdated = DateTime.UtcNow.AddMinutes(-10);

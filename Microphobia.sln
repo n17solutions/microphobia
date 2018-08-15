@@ -44,6 +44,10 @@ ProjectSection(SolutionItems) = preProject
 	after.Microphobia.sln.targets = after.Microphobia.sln.targets
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microphobia.Postgres.Migrations.Task", "Microphobia.Postgres.Migrations.Task\Microphobia.Postgres.Migrations.Task.csproj", "{3F426812-FE2D-4F19-8979-919A18BAA02C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microphobia.Postgres.Migrations.SystemLog", "Microphobia.Postgres.Migrations.SystemLog\Microphobia.Postgres.Migrations.SystemLog.csproj", "{9D7947DD-E0BD-4667-A87A-57511DD5C407}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +122,14 @@ Global
 		{99CB4CD6-EAA4-4F07-A0B2-3281BD982F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99CB4CD6-EAA4-4F07-A0B2-3281BD982F01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99CB4CD6-EAA4-4F07-A0B2-3281BD982F01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F426812-FE2D-4F19-8979-919A18BAA02C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F426812-FE2D-4F19-8979-919A18BAA02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F426812-FE2D-4F19-8979-919A18BAA02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F426812-FE2D-4F19-8979-919A18BAA02C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D7947DD-E0BD-4667-A87A-57511DD5C407}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D7947DD-E0BD-4667-A87A-57511DD5C407}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D7947DD-E0BD-4667-A87A-57511DD5C407}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D7947DD-E0BD-4667-A87A-57511DD5C407}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

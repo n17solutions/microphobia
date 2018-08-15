@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace N17Solutions.Microphobia.Postgres.Migrations
+namespace N17Solutions.Microphobia.Postgres.Migrations.SystemLog.Migrations
 {
     public partial class InitialCreate : Migration
     {
@@ -12,7 +12,7 @@ namespace N17Solutions.Microphobia.Postgres.Migrations
                 name: "microphobia");
 
             migrationBuilder.CreateTable(
-                name: "TaskInfo",
+                name: "SystemLog",
                 schema: "microphobia",
                 columns: table => new
                 {
@@ -21,24 +21,22 @@ namespace N17Solutions.Microphobia.Postgres.Migrations
                     DateCreated = table.Column<DateTime>(nullable: false),
                     DateLastUpdated = table.Column<DateTime>(nullable: false),
                     ResourceId = table.Column<Guid>(nullable: false),
-                    AssemblyName = table.Column<string>(nullable: true),
-                    TypeName = table.Column<string>(nullable: true),
-                    MethodName = table.Column<string>(nullable: true),
-                    ReturnType = table.Column<string>(nullable: true),
-                    Status = table.Column<int>(nullable: false),
-                    FailureDetails = table.Column<string>(nullable: true),
+                    Message = table.Column<string>(nullable: true),
+                    StackTrace = table.Column<string>(nullable: true),
+                    Source = table.Column<string>(nullable: true),
+                    Level = table.Column<int>(nullable: false),
                     Data = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TaskInfo", x => x.Id);
+                    table.PrimaryKey("PK_SystemLog", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TaskInfo",
+                name: "SystemLog",
                 schema: "microphobia");
         }
     }

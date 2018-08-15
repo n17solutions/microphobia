@@ -7,14 +7,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
-using N17Solutions.Microphobia.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
-using N17Solutions.Microphobia.ServiceResolution;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using N17Solutions.Microphobia.Utilities.Serialization;
-using N17Solutions.Microphobia.Websockets.Hubs;
 using Shouldly;
 using Xunit;
 
@@ -122,7 +122,7 @@ namespace N17Solutions.Microphobia.Tests
             
             _configuration = new MicrophobiaConfiguration(microphobiaContextMock);
             
-            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock, _configuration), _configuration, _loggerFactoryMock.Object);
+            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock, _configuration), _configuration, _loggerFactoryMock.Object, Mock.Of<ISystemLogProvider>());
         }
 
         [Fact]

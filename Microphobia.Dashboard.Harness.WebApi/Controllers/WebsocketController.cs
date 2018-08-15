@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using N17Solutions.Microphobia.Websockets.Hubs;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 
 namespace Microphobia.Dashboard.Harness.WebApi.Controllers
 {

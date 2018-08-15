@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using N17Solutions.Microphobia.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 
 namespace N17Solutions.Microphobia.Dashboard
 {

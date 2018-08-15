@@ -2,8 +2,10 @@
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using N17Solutions.Microphobia.Domain.Model;
+using N17Solutions.Microphobia.ServiceContract.Enums;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.Utilities.Extensions;
+using N17Solutions.Microphobia.Utilities.Identifiers;
 using N17Solutions.Microphobia.Utilities.Serialization;
 
 namespace N17Solutions.Microphobia.Domain.Tasks
@@ -81,12 +83,13 @@ namespace N17Solutions.Microphobia.Domain.Tasks
         /// Transforms a <see cref="ServiceContract.Models.TaskInfo" /> model into a <see cref="TaskInfo" /> domain model.
         /// </summary>
         /// <param name="response">The response to transform.</param>
+        /// <param name="storageType">The storage mechanism currently in use - helps generate the correct resource id</param>
         /// <returns>The resultant domain model.</returns>
-        public static TaskInfo FromTaskInfoResponse(ServiceContract.Models.TaskInfo response)
+        public static TaskInfo FromTaskInfoResponse(ServiceContract.Models.TaskInfo response, Storage storageType)
         {
             var taskInfo = new TaskInfo
             {
-                ResourceId = response.Id.IsDefault() ? Guid.NewGuid() : response.Id,
+                ResourceId = response.Id.IsDefault() ? SequentialGuidGenerator.Generate(storageType) : response.Id,
                 AssemblyName = response.AssemblyName,
                 TypeName = response.TypeName,
                 MethodName = response.MethodName,

@@ -1,10 +1,8 @@
 ﻿using System;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
-using N17Solutions.Microphobia.Configuration;
-using N17Solutions.Microphobia.Extensions;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
-using N17Solutions.Microphobia.Websockets.Hubs;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.Dashboard
 {

@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace N17Solutions.Microphobia.Postgres.Migrations
+namespace N17Solutions.Microphobia.Postgres.Migrations.SystemLog.Migrations
 {
-    [DbContext(typeof(TaskContext))]
-    [Migration("20180727074253_InitialCreate")]
+    [DbContext(typeof(SystemLogContext))]
+    [Migration("20180815125200_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,12 +21,10 @@ namespace N17Solutions.Microphobia.Postgres.Migrations
                 .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("N17Solutions.Microphobia.Domain.Tasks.TaskInfo", b =>
+            modelBuilder.Entity("N17Solutions.Microphobia.Domain.Logs.SystemLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<string>("AssemblyName");
 
                     b.Property<string>("Data");
 
@@ -34,21 +32,19 @@ namespace N17Solutions.Microphobia.Postgres.Migrations
 
                     b.Property<DateTime>("DateLastUpdated");
 
-                    b.Property<string>("FailureDetails");
+                    b.Property<int>("Level");
 
-                    b.Property<string>("MethodName");
+                    b.Property<string>("Message");
 
                     b.Property<Guid>("ResourceId");
 
-                    b.Property<string>("ReturnType");
+                    b.Property<string>("Source");
 
-                    b.Property<int>("Status");
-
-                    b.Property<string>("TypeName");
+                    b.Property<string>("StackTrace");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaskInfo","microphobia");
+                    b.ToTable("SystemLog","microphobia");
                 });
 #pragma warning restore 612, 618
         }

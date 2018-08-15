@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using N17Solutions.Microphobia.Domain.Tasks;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Enums;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using TaskInfo = N17Solutions.Microphobia.ServiceContract.Models.TaskInfo;
 
@@ -14,10 +16,12 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
     public class DataProvider : IDataProvider
     {
         private readonly TaskContext _context;
+        private readonly Storage _storageType;
 
-        public DataProvider(TaskContext context)
+        public DataProvider(TaskContext context, MicrophobiaConfiguration microphobiaConfiguration)
         {
             _context = context;
+            _storageType = microphobiaConfiguration.StorageType;
         }
 
         public async Task Enqueue(TaskInfo task, CancellationToken cancellationToken = default(CancellationToken))
@@ -26,7 +30,7 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
             if (existingTask == null)
             {
                 task.Status = TaskStatus.Created;
-                var domainObject = Domain.Tasks.TaskInfo.FromTaskInfoResponse(task);
+                var domainObject = Domain.Tasks.TaskInfo.FromTaskInfoResponse(task, _storageType);
                 await _context.Tasks.AddAsync(domainObject, cancellationToken).ConfigureAwait(false);
             }
             else

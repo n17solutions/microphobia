@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
-using N17Solutions.Microphobia.Websockets.Hubs;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.Extensions
 {

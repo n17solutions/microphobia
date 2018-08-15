@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
-namespace N17Solutions.Microphobia.Websockets.Hubs
+namespace N17Solutions.Microphobia.ServiceContract.Websockets.Hubs
 {
     public class MicrophobiaHubContext
     {

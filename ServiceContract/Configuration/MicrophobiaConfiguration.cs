@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using N17Solutions.Microphobia.ServiceContract.Enums;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 using N17Solutions.Microphobia.ServiceResolution;
-using N17Solutions.Microphobia.Websockets.Hubs;
 
-namespace N17Solutions.Microphobia.Configuration
+namespace N17Solutions.Microphobia.ServiceContract.Configuration
 {
     public class MicrophobiaConfiguration
     {

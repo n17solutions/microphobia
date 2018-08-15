@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using N17Solutions.Microphobia.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 
 namespace N17Solutions.Microphobia.Dashboard.Controllers
 {

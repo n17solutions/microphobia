@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>N17Solutions.Microphobia.Postgres.Migrations.SystemLog</AssemblyName>
+    <RootNamespace>N17Solutions.Microphobia.Postgres.Migrations.SystemLog</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Data.EntityFramework\Data.EntityFramework.csproj" />
+  </ItemGroup>
+</Project>

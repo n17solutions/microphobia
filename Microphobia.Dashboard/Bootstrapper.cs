@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Builder;
-using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using N17Solutions.Microphobia.Configuration;
-using N17Solutions.Microphobia.Extensions;
-using N17Solutions.Microphobia.ServiceContract.Providers;
 
 namespace N17Solutions.Microphobia.Dashboard
 {

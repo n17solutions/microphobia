@@ -34,6 +34,10 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Extensions
             }
 
             var entityType = FindEntityType(configuration.GetType());
+            
+            if (modelBuilder.Model.FindEntityType(entityType) == null)
+                return modelBuilder;
+            
             dynamic entityTypeBuilder = EntityMethod.MakeGenericMethod(entityType).Invoke(modelBuilder, new object[0]);
             
             configuration.Configure(entityTypeBuilder);

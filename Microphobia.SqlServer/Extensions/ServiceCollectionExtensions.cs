@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using N17Solutions.Microphobia.Configuration;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using N17Solutions.Microphobia.Data.EntityFramework.Conventions;
 using N17Solutions.Microphobia.Data.EntityFramework.Extensions;
 using N17Solutions.Microphobia.Extensions;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Enums;
-using N17Solutions.Microphobia.Websockets.Hubs;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.SqlServer.Extensions
 {

@@ -4,27 +4,24 @@
     <AssemblyName>N17Solutions.Microphobia.Data.EntityFramework</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Data.EntityFramework</RootNamespace>
   </PropertyGroup>
-
-    <PropertyGroup>
-        <PackageId>N17Solutions.Microphobia.Data.EntityFramework</PackageId>
-        <Authors>James Woodley</Authors>
-        <Company>N17 Solutions</Company>
-        <Title>Microphobia - EntityFramework</Title>
-        <Description>Long Running Process Execution in Dotnet. Runs long running processes in the background of your application allowing you to fire and forget any long running processes you may need to execute. Targeted toward the EntityFramework ORM.</Description>
-        <PackageTags>n17solutions;micro;phobia;microphobia;long running process;background process;entityframework</PackageTags>
-        <Version>1.0.0</Version>
-        <PackageVersion>1.0.0</PackageVersion>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
-        <InformationalVersion>1.0.0</InformationalVersion>
-        <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
-        <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
-    </PropertyGroup>
-
+  <PropertyGroup>
+    <PackageId>N17Solutions.Microphobia.Data.EntityFramework</PackageId>
+    <Authors>James Woodley</Authors>
+    <Company>N17 Solutions</Company>
+    <Title>Microphobia - EntityFramework</Title>
+    <Description>Long Running Process Execution in Dotnet. Runs long running processes in the background of your application allowing you to fire and forget any long running processes you may need to execute. Targeted toward the EntityFramework ORM.</Description>
+    <PackageTags>n17solutions;micro;phobia;microphobia;long running process;background process;entityframework</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0</PackageVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.1" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>

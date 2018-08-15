@@ -9,23 +9,23 @@ using N17Solutions.Microphobia.Utilities.Configuration;
 
 namespace N17Solutions.Microphobia.Postgres.Harness.Context
 {
-    class PostgresContextCreator : IDesignTimeDbContextFactory<TaskContext>
+    class PostgresSystemLogContextCreator : IDesignTimeDbContextFactory<SystemLogContext>
     {
-        public TaskContext CreateDbContext(string[] args)
+        public SystemLogContext CreateDbContext(string[] args)
         {
             var configurationManager = new ConfigurationManager(new ConfigurationBuilder());
             var databaseConfig = configurationManager.Bind<DatabaseConfig>();
 
-            var dbOptions = new DbContextOptionsBuilder<TaskContext>()
+            var dbOptions = new DbContextOptionsBuilder<SystemLogContext>()
                 .UseNpgsql(databaseConfig.ConnectionString,
                     x =>
                     {
-                        x.MigrationsAssembly("N17Solutions.Microphobia.Postgres");
-                        x.MigrationsHistoryTable(ServiceCollectionExtensions.PostgresHistoryTableName, Schema.MicrophobiaSchemaName);
+                        x.MigrationsAssembly("N17Solutions.Microphobia.Postgres.Migrations.SystemLog");
+                        x.MigrationsHistoryTable(ServiceCollectionExtensions.PostgresSystemLogContextHistoryTableName, Schema.MicrophobiaSchemaName);
                     })
                 .Options;
             
-            return new TaskContext(dbOptions);
+            return new SystemLogContext(dbOptions);
         }
     }
 }

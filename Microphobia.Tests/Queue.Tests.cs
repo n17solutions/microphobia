@@ -4,11 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
-using N17Solutions.Microphobia.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 using N17Solutions.Microphobia.Utilities.Extensions;
-using N17Solutions.Microphobia.Websockets.Hubs;
 using Shouldly;
 using Xunit;
 // ReSharper disable ClassNeverInstantiated.Local

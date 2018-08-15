@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using N17Solutions.Microphobia.Configuration;
-using N17Solutions.Microphobia.ServiceContract.Providers;
-using N17Solutions.Microphobia.Websockets.Hubs;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia.Dashboard
 {

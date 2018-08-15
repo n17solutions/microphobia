@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace N17Solutions.Microphobia.Postgres.Migrations
+namespace N17Solutions.Microphobia.Postgres.Migrations.Task.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    [Migration("20180815093659_IsAsyncColumn")]
-    partial class IsAsyncColumn
+    [Migration("20180815124922_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -2,12 +2,12 @@
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using N17Solutions.Microphobia.Configuration;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
+using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 using N17Solutions.Microphobia.ServiceResolution;
 using N17Solutions.Microphobia.Utilities.Extensions;
-using N17Solutions.Microphobia.Websockets.Hubs;
 
 namespace N17Solutions.Microphobia
 {
