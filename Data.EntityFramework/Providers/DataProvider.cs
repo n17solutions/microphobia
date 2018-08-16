@@ -67,7 +67,12 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
 
         public async Task<IEnumerable<TaskInfo>> GetTasks(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var tasks = await _context.Tasks.Select(TaskInfoExpressions.ToTaskInfoResponse).ToArrayAsync(cancellationToken).ConfigureAwait(false);
+            var tasks = await _context.Tasks
+                .OrderByDescending(task => task.DateLastUpdated)
+                .Select(TaskInfoExpressions.ToTaskInfoResponse)
+                .ToArrayAsync(cancellationToken)
+                .ConfigureAwait(false);
+            
             return tasks;
         }
 
