@@ -13,6 +13,7 @@ namespace N17Solutions.Microphobia.Dashboard.Models
         public string MethodName { get; }
         public string Status { get; }
         public uint StatusId { get; }
+        public string Arguments { get; }
         public string DateCreated { get; }
         public string DateLastUpdated { get; }
         public string FailureDetails { get; }
@@ -25,6 +26,7 @@ namespace N17Solutions.Microphobia.Dashboard.Models
             MethodName = taskInfo.MethodName;
             Status = taskInfo.Status.Humanize().Transform(To.TitleCase);
             StatusId = (uint) taskInfo.Status;
+            Arguments = string.Join(", ", taskInfo.Arguments);
             DateCreated = taskInfo.DateCreated.Humanize();
             DateLastUpdated = taskInfo.DateLastUpdated.Humanize();
             FailureDetails = taskInfo.FailureDetails;

@@ -75,15 +75,17 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
         {
             // Arrange
             Expression<Action<TestOperator>> expression1 = x => x.VoidMethod();
-            Expression<Action<TestOperator>> expression2 = x => x.ResultMethod();
             var task1 = TaskInfo.FromTaskInfoResponse(expression1.ToTaskInfo(), Storage.None);
-            task1.DateCreated = DateTime.UtcNow;
-            task1.DateLastUpdated = task1.DateCreated;
 
+            Expression<Action<TestOperator>> expression2 = x => x.ResultMethod();
             var task2 = TaskInfo.FromTaskInfoResponse(expression2.ToTaskInfo(), Storage.None);
-            task2.DateCreated = DateTime.UtcNow.AddMinutes(-5);
-            task2.DateLastUpdated = DateTime.UtcNow.AddMinutes(-10);
+
             await _context.Tasks.AddRangeAsync(task1, task2).ConfigureAwait(false);
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+            
+            Thread.Sleep(2000);
+
+            task1.Status = TaskStatus.Canceled;
             await _context.SaveChangesAsync().ConfigureAwait(false);
             
             // Act

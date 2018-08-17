@@ -48,11 +48,6 @@ namespace N17Solutions.Microphobia.ServiceContract.Models
         public string FailureDetails { get; set; }
         
         /// <summary>
-        /// Whether the Task is asynchronous or not.
-        /// </summary>
-        public bool IsAsync { get; set; }
-        
-        /// <summary>
         /// The Date this Task was created.
         /// </summary>
         public DateTime DateCreated { get; set; }
