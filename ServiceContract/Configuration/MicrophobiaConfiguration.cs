@@ -16,11 +16,13 @@ namespace N17Solutions.Microphobia.ServiceContract.Configuration
             _microphobiaHub = microphobiaHub;            
         }
         
-        public int PollIntervalMs { get; set; } = 100;
+        public int PollIntervalMs { get; set; } = 500;
         
         public Storage StorageType { get; set; }
         
         public ServiceFactory ServiceFactory { get; set; }
+
+        public int StopLoggingNothingToQueueAfter { get; set; } = 3;
         
         public bool IsRunning
         {

@@ -18,8 +18,7 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
             var args = taskInfo.Arguments;
 
             object instance = null;
-            MethodInfo method;
-            method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            var method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             if (method == null)
             {
                 instance = serviceFactory != null ? serviceFactory(type) : Activator.CreateInstance(type);

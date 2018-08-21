@@ -159,6 +159,7 @@ namespace N17Solutions.Microphobia.Tests
             Thread.Sleep(1000);
 
             // Assert
+            var logs = ClientLogger.Logs.ToArray();
             ClientLogger.Logs.FirstOrDefault(x => x.Contains("Log Level: Error")).ShouldNotBeNull();
         }
 
