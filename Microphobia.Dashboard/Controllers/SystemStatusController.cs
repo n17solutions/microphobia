@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
 
 namespace N17Solutions.Microphobia.Dashboard.Controllers
@@ -9,10 +12,10 @@ namespace N17Solutions.Microphobia.Dashboard.Controllers
         private readonly MicrophobiaConfiguration _config;
         private readonly Client _client;
 
-        public SystemStatusController(MicrophobiaConfiguration config, Client client)
+        public SystemStatusController(MicrophobiaConfiguration config, IHostedService client)
         {
             _config = config;
-            _client = client;
+            _client = (Client)client;
         }
 
         [HttpGet]
@@ -23,17 +26,17 @@ namespace N17Solutions.Microphobia.Dashboard.Controllers
 
         [HttpPut]
         [Route("stop")]
-        public IActionResult StopClient()
+        public async Task<IActionResult> StopClient(CancellationToken cancellationToken)
         {
-            _client.Stop();
+            await _client.StopAsync(cancellationToken);
             return Ok();
         }
 
         [HttpPut]
         [Route("start")]
-        public IActionResult StartClient()
+        public async Task<IActionResult> StartClient(CancellationToken cancellationToken)
         {
-            _client.Start();
+            await _client.StartAsync(cancellationToken);
             return Ok();
         }
     }

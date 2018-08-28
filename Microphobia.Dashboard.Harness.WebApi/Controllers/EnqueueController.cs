@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using N17Solutions.Microphobia;
-using StructureMap;
 
 namespace Microphobia.Dashboard.Harness.WebApi.Controllers
 {

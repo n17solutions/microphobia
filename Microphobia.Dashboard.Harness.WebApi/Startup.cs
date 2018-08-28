@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microphobia.Dashboard.Harness.WebApi.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using N17Solutions.Microphobia;
 using N17Solutions.Microphobia.Dashboard;
 using N17Solutions.Microphobia.Extensions;
 using N17Solutions.Microphobia.Postgres.Extensions;
+using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Microphobia.Dashboard.Harness.WebApi
 {
@@ -49,12 +56,16 @@ namespace Microphobia.Dashboard.Harness.WebApi
 
             app.UseMvc();
 
-            applicationLifetime.ApplicationStopping.Register(() => OnShutdown(serviceProvider.GetRequiredService<Client>()));
+            applicationLifetime.ApplicationStopping.Register(async () => await OnShutdown(serviceProvider.GetServices<IHostedService>()));
         }
 
-        private static void OnShutdown(Client client)
+        private static async Task OnShutdown(IEnumerable<IHostedService> hostedServices)
         {
-            client.Stop();
+            if (hostedServices != null)
+            {
+                var stopTasks = hostedServices.Select(service => service.StopAsync(CancellationToken.None)).ToList();
+                await Task.WhenAll(stopTasks);
+            }
         }
     }
 }

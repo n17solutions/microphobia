@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
@@ -14,13 +13,11 @@ namespace N17Solutions.Microphobia
     {
         private readonly IDataProvider _dataProvider;
         private readonly MicrophobiaHubContext _taskHubContext;
-        private readonly MicrophobiaConfiguration _config;
-
-        public Queue(IDataProvider dataProvider, MicrophobiaHubContext taskHubContext, MicrophobiaConfiguration config)
+        
+        public Queue(IDataProvider dataProvider, MicrophobiaHubContext taskHubContext)
         {
             _dataProvider = dataProvider;
             _taskHubContext = taskHubContext;
-            _config = config;
         }
 
         public Task Enqueue(Expression<Action> expression)
@@ -78,16 +75,18 @@ namespace N17Solutions.Microphobia
             if (task != null)
             {
                 task.Status = status;
-                await _dataProvider.Save(task);
+                await _dataProvider.Save(task).ConfigureAwait(false);
 
-                await _taskHubContext.RefreshTasks();
+                await _taskHubContext.RefreshTasks().ConfigureAwait(false);
             }
         }
         
-        private Task Enqueue(TaskInfo taskInfo)
+        private async Task Enqueue(TaskInfo taskInfo)
         {
             taskInfo.Status = TaskStatus.Created;
-            return Task.WhenAll(_dataProvider.Enqueue(taskInfo), _taskHubContext.RefreshTasks());
+            
+            await _dataProvider.Enqueue(taskInfo).ConfigureAwait(false);
+            await _taskHubContext.RefreshTasks().ConfigureAwait(false);
         }
     }
 }

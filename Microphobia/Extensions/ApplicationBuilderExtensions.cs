@@ -12,9 +12,6 @@ namespace N17Solutions.Microphobia.Extensions
             var config = app.ApplicationServices.GetService<MicrophobiaConfiguration>();
             configAction?.Invoke(config);
             
-            var client = app.ApplicationServices.GetRequiredService<Client>();
-            client.Start();
-            
             return app;
         }
     }

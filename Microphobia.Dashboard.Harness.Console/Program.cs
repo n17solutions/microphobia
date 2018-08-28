@@ -37,18 +37,18 @@ namespace N17Solutions.Microphobia.Dashboard.Harness.Console
                 var configuration = new ConfigurationManager(new ConfigurationBuilder());
                 var services = PostgresBootstrapper.Strap(configuration.GetConnectionString("Microphobia"));
 
-                serviceProvider = services.BuildServiceProvider();
+                /*serviceProvider = services.BuildServiceProvider();
                 client = serviceProvider.GetRequiredService<Client>();
 
-                client?.Start();
+                client?.Start();*/
                 DashboardBootstrapper.Strap(serviceProvider);
             });
 
             task.ContinueWith(t => System.Console.WriteLine($"An error occurred.{Environment.NewLine}{JsonConvert.SerializeObject(t.Exception)}"), TaskContinuationOptions.OnlyOnFaulted);
 
             exitEvent.WaitOne();
-            System.Console.WriteLine("Exiting");
-            client?.Stop();
+            /*System.Console.WriteLine("Exiting");
+            client?.Stop();*/
         }
     }
 }

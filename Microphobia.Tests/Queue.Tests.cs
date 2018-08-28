@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
-using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
@@ -40,9 +39,7 @@ namespace N17Solutions.Microphobia.Tests
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
             var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);
             
-            var configuration = new MicrophobiaConfiguration(microphobiaContextMock);
-            
-            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock, configuration);
+            _sut = new Queue(_dataProviderMock.Object, microphobiaContextMock);
         }
 
         [Fact]

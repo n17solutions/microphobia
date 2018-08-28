@@ -21,7 +21,7 @@ namespace N17Solutions.Microphobia.Tests
 {
     public class ClientTests : IDisposable
     {
-        public class ClientLogger : ILogger
+        public class ClientLogger<T> : ILogger<T>
         {
             public static List<string> Logs = new List<string>();
 
@@ -104,14 +104,11 @@ namespace N17Solutions.Microphobia.Tests
         }
 
         private readonly Mock<IDataProvider> _dataProviderMock = new Mock<IDataProvider>();
-        private readonly Mock<ILoggerFactory> _loggerFactoryMock = new Mock<ILoggerFactory>();
         private readonly MicrophobiaConfiguration _configuration;
         private readonly Client _sut;
 
         public ClientTests()
         {
-            _loggerFactoryMock.Setup(x => x.CreateLogger(It.IsAny<string>())).Returns(new ClientLogger());
-
             var clientsProxyMock = new Mock<IClientProxy>();
             var hubClientsMock = new Mock<IHubClients>();
             hubClientsMock.SetupGet(x => x.All).Returns(clientsProxyMock.Object);
@@ -121,96 +118,95 @@ namespace N17Solutions.Microphobia.Tests
             
             _configuration = new MicrophobiaConfiguration(microphobiaContextMock);
             
-            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock, _configuration), _configuration, _loggerFactoryMock.Object, Mock.Of<ISystemLogProvider>());
+            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock), _configuration, new ClientLogger<Client>(), Mock.Of<ISystemLogProvider>());
         }
 
         [Fact]
-        public void Should_Start_Without_Error()
+        public async Task Should_Start_Without_Error()
         {
             // Act
-            Should.NotThrow(() => _sut.Start());
-
+            Should.NotThrow(async () => await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false));
+            
             // Assert (to get here, means success)
-            _sut.Stop();
+            await _sut.StopAsync(CancellationToken.None).ConfigureAwait(false);
         }
 
         [Fact]
-        public void Should_Stop_Without_Error()
+        public async Task Should_Stop_Without_Error()
         {
             // Arrange
-            _sut.Start();
-
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            
             // Allow everything to get going, then stop
             Thread.Sleep(1500);
-
+            
             // Act/Assert
-            Should.NotThrow(() => _sut.Stop());
+            Should.NotThrow(async () => await _sut.StopAsync(CancellationToken.None).ConfigureAwait(false));
         }
 
         [Fact]
-        public void Should_Log_Task_Exception()
+        public async Task Should_Log_Task_Exception()
         {
             // Arrange
             Expression<Action<TestOperations>> expression = to => to.ExceptionThrower();
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
-
+            
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
-
+            
             // Assert
-            var logs = ClientLogger.Logs.ToArray();
-            ClientLogger.Logs.FirstOrDefault(x => x.Contains("Log Level: Error")).ShouldNotBeNull();
+            ClientLogger<Client>.Logs.ToArray().FirstOrDefault(x => x.Contains("Log Level: Error")).ShouldNotBeNull();
         }
-
+        
         [Fact]
-        public void Should_Log_Task_Started()
+        public async Task Should_Log_Task_Started()
         {
             // Arrange
             Expression<Action<TestOperations>> expression = to => to.Runner();
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
 
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
 
             // Assert
-            ClientLogger.Logs.FirstOrDefault(x => x.Contains("Task Started") && x.Contains(nameof(TestOperations.Runner))).ShouldNotBeNull();
+            ClientLogger<Client>.Logs.ToArray().FirstOrDefault(x => x.Contains("Task Started") && x.Contains(nameof(TestOperations.Runner))).ShouldNotBeNull();
         }
-
+        
         [Fact]
-        public void Should_Log_Task_Completed()
+        public async Task Should_Log_Task_Completed()
         {
             // Arrange
             Expression<Action<TestOperations>> expression = to => to.Runner();
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
 
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
 
             // Assert
-            ClientLogger.Logs.FirstOrDefault(x => x.Contains("Task Finished Processing") && x.Contains(nameof(TestOperations.Runner))).ShouldNotBeNull();
+            ClientLogger<Client>.Logs.ToArray().FirstOrDefault(x => x.Contains("Task Finished Processing") && x.Contains(nameof(TestOperations.Runner))).ShouldNotBeNull();
+        }
+        
+        [Fact]
+        public async Task Should_Perform_Task()
+        {
+            // Arrange
+            File.Delete("TEST.txt");
+            Expression<Action<TestOperations>> expression = to => to.FileCreator();
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
+ 
+            // Act
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
+            Thread.Sleep(1000);
+ 
+            // Assert
+            File.Exists("TEST.txt").ShouldBeTrue();
         }
 
         [Fact]
-         public void Should_Perform_Task()
-         {
-             // Arrange
-             File.Delete("TEST.txt");
-             Expression<Action<TestOperations>> expression = to => to.FileCreator();
-             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
- 
-             // Act
-             _sut.Start();
-             Thread.Sleep(1000);
- 
-             // Assert
-             File.Exists("TEST.txt").ShouldBeTrue();
-         }
-
-        [Fact]
-        public void Should_Perform_Task_With_A_Guid_Argument()
+        public async Task Should_Perform_Task_With_A_Guid_Argument()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -221,7 +217,7 @@ namespace N17Solutions.Microphobia.Tests
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
 
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
 
             // Assert
@@ -229,7 +225,7 @@ namespace N17Solutions.Microphobia.Tests
         }
 
         [Fact]
-        public void Should_Perform_Asynchronous_Task()
+        public async Task Should_Perform_Asynchronous_Task()
         {
             // Arrange
             File.Delete("TEST.async.txt");
@@ -237,7 +233,7 @@ namespace N17Solutions.Microphobia.Tests
             _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(expression.ToTaskInfo());
             
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
             
             // Assert
@@ -246,7 +242,7 @@ namespace N17Solutions.Microphobia.Tests
 
         [Fact]
         [Trait("Reason", "Found errors in the wild.")]
-        public void Should_Deserialise_Multiple_Guids_Properly()
+        public async Task Should_Deserialise_Multiple_Guids_Properly()
         {
             // Arrange
             var guid1 = Guid.NewGuid();
@@ -264,7 +260,7 @@ namespace N17Solutions.Microphobia.Tests
             });
             
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
             
             // Assert
@@ -273,7 +269,7 @@ namespace N17Solutions.Microphobia.Tests
         
         [Fact]
         [Trait("Reason", "Found errors in the wild.")]
-        public void Should_Deserialise_Multiple_Bool_Properly()
+        public async Task Should_Deserialise_Multiple_Bool_Properly()
         {
             // Arrange
             const bool bool1 = false;
@@ -291,7 +287,7 @@ namespace N17Solutions.Microphobia.Tests
             });
             
             // Act
-            _sut.Start();
+            await _sut.StartAsync(CancellationToken.None).ConfigureAwait(false);
             Thread.Sleep(1000);
             
             // Assert
@@ -300,7 +296,7 @@ namespace N17Solutions.Microphobia.Tests
 
         public void Dispose()
         {
-            _sut.Stop();
+            _sut.StopAsync(CancellationToken.None).Wait();
         }
     }
 }
