@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
@@ -114,11 +115,19 @@ namespace N17Solutions.Microphobia.Tests
             hubClientsMock.SetupGet(x => x.All).Returns(clientsProxyMock.Object);
             var hubContextMock = new Mock<IHubContext<MicrophobiaHub>>();
             hubContextMock.SetupGet(x => x.Clients).Returns(hubClientsMock.Object);
-            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object);  
+            var microphobiaContextMock = new MicrophobiaHubContext(hubContextMock.Object); 
+            var queueMock = new Queue(_dataProviderMock.Object, microphobiaContextMock);
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock.Setup(x => x.GetService(typeof(Queue))).Returns(queueMock);
+            var serviceScopeMock = new Mock<IServiceScope>();
+            serviceScopeMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+            var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
+            serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(serviceScopeMock.Object);
             
             _configuration = new MicrophobiaConfiguration(microphobiaContextMock);
             
-            _sut = new Client(new Queue(_dataProviderMock.Object, microphobiaContextMock), _configuration, new ClientLogger<Client>(), Mock.Of<ISystemLogProvider>());
+            _sut = new Client(serviceScopeFactoryMock.Object, _configuration, new ClientLogger<Client>(), Mock.Of<ISystemLogProvider>());
         }
 
         [Fact]
