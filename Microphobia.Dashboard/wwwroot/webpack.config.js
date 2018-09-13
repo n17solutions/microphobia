@@ -3,6 +3,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 const resolve = (dir) => path.join(__dirname, dir)
 
@@ -68,6 +69,13 @@ module.exports = {
   },
 
   plugins: [
+      new FaviconsWebpackPlugin({
+          logo: 'logo.png',
+          prefix: '/favicons/[hash]-',
+          persistentCache: true,
+          inject: true,
+          title: 'Microphobia'
+      }),
       new HtmlWebpackPlugin({
           template: resolve('./src/index.html')
       }),
