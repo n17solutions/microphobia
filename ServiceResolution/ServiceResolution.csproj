@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.ServiceResolution</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.ServiceResolution</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>

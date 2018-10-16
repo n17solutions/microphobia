@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using N17Solutions.Microphobia.ServiceContract.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace N17Solutions.Microphobia.ServiceContract.Models
 {
@@ -46,6 +48,12 @@ namespace N17Solutions.Microphobia.ServiceContract.Models
         /// If the Task Faulted, any information as to why.
         /// </summary>
         public string FailureDetails { get; set; }
+        
+        /// <summary>
+        /// Any tags attributed to this Task
+        /// </summary>
+        /// <remarks>Allows distinguishing between different Task sets</remarks>    
+        public string[] Tags { get; set; }
         
         /// <summary>
         /// The Date this Task was created.

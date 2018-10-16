@@ -14,14 +14,24 @@ namespace N17Solutions.Microphobia.ServiceContract.Providers
         /// <param name="task">The task to Enqueue.</param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
         /// <remarks>Will enqueue with a status of <see cref="TaskStatus.Created" /> regardless of the status given. This is an enqueue action not a save action.</remarks>
-        Task Enqueue(TaskInfo task, CancellationToken cancellationToken = default(CancellationToken));
+        Task Enqueue(TaskInfo task, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the next Task to Execute.
         /// </summary>
+        /// <param name="tag">Any tag to use in the dequeue query.</param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
-        /// <returns><see cref="TaskInfo" /> representing the dequeued task.</returns>
-        Task<TaskInfo> Dequeue(CancellationToken cancellationToken = default(CancellationToken));
+        /// <returns>A <see cref="TaskInfo" /> representing the dequeued task.</returns>
+        Task<TaskInfo> DequeueSingle(string tag = default, CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Gets the next Tasks to Execute.
+        /// </summary>
+        /// <param name="tag">Any tag to use in the dequeue query.</param>
+        /// <param name="limit">If we want to limit the amount of tasks to dequeue.</param>
+        /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
+        /// <returns>A collection of <see cref="TaskInfo" /> representing the dequeued tasks.</returns>
+        Task<IEnumerable<TaskInfo>> Dequeue(string tag = default, int? limit = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the Task with the given unique identifier.
@@ -29,14 +39,17 @@ namespace N17Solutions.Microphobia.ServiceContract.Providers
         /// <param name="taskId">The globally unique identifier to use to fetch the Task.</param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
         /// <returns>The <see cref="TaskInfo" /> found with the given identifier.</returns>
-        Task<TaskInfo> GetTaskInfo(Guid taskId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TaskInfo> GetTaskInfo(Guid taskId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets all Tasks in the system matching the given filters.
         /// </summary>
+        /// <param name="sinceWhen">If provided, only tasks created since this date will be retrieved.</param>
+        /// <param name="tag">If provided, only tasks with the given tag will be retrieved.</param>
+        /// <param name="status">If provided, only tasks with the given status will be retrieved.></param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
         /// <returns>A collection of <see cref="TaskInfo" /> objects found that match the given filters.</returns>
-        Task<IEnumerable<TaskInfo>> GetTasks(CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TaskInfo>> GetTasks(DateTime? sinceWhen = null, string tag = default, TaskStatus status = default, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Saves a Task instance.
@@ -45,6 +58,46 @@ namespace N17Solutions.Microphobia.ServiceContract.Providers
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
         /// <remarks>Will not Enqueue, only updates Tasks.</remarks>
         /// <example>To update a status</example>
-        Task Save(TaskInfo task, CancellationToken cancellationToken = default(CancellationToken));
+        Task Save(TaskInfo task, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Registers a Queue Runner as part of the system.
+        /// </summary>
+        /// <param name="runner">The runner to register.</param>
+        /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
+        Task RegisterQueueRunner(QueueRunner runner, CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// De-registers a Queue Runner from the system.
+        /// </summary>
+        /// <param name="name">The name of the runner to de-register.</param>
+        /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
+        Task DeregisterQueueRunner(string name, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// De-registers multiple Queue Runners from the system.
+        /// </summary>
+        /// <param name="names">A collection of the runner names to de-register.</param>
+        /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
+        Task DeregisterQueueRunners(IEnumerable<string> names, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Marks the Queue Runner with the given name as having processed a task.
+        /// </summary>
+        /// <param name="runnerName">The name of the Queue Runner to mark.</param>
+        /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
+        Task MarkQueueRunnerTaskProcessed(string runnerName, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all the runners currently registered.
+        /// </summary>
+        /// <param name="tag">Only gets runners with the assigned tag.</param>
+        /// <param name="isRunning">Denotes whether to only retrieve Runners that are currently running or not.</param>
+        /// <param name="lastUpdatedSince">If provided, will only retrieve Runners that have marked updated since the date provided.</param>
+        /// <param name="lastUpdatedBefore">If provided, will only retrieve Runners that have marked last updated before the date provided.</param>
+        /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
+        /// <returns>A collection of <see cref="QueueRunner" /> objects that match the given filters.</returns>
+        Task<IEnumerable<QueueRunner>> GetRunners(string tag = default, bool isRunning = true, DateTime? lastUpdatedSince = null, DateTime? lastUpdatedBefore = null,
+            CancellationToken cancellationToken = default);
     }
 }

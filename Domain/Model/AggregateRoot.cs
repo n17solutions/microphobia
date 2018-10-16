@@ -14,7 +14,7 @@ namespace N17Solutions.Microphobia.Domain.Model
         /// <remarks>
         /// This is the globally unique identifier that clients can use to reference this aggregate. This is also the identifier you must use for cross-aggregate references.
         /// </remarks>
-        public Guid ResourceId { get; set; }
+        public Guid ResourceId { get; set; } = Guid.NewGuid();
         
         protected AggregateRoot() {}
 

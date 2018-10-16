@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -9,9 +10,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace N17Solutions.Microphobia.Postgres.Migrations.Task.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    partial class TaskContextModelSnapshot : ModelSnapshot
+    [Migration("20181015134935_Add-QueueRunner")]
+    partial class AddQueueRunner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,11 +40,9 @@ namespace N17Solutions.Microphobia.Postgres.Migrations.Task.Migrations
 
                     b.Property<Guid>("ResourceId");
 
-                    b.Property<string>("Tag");
-
                     b.HasKey("Id");
 
-                    b.ToTable("QueueRunner","microphobia");
+                    b.ToTable("QueueRunner");
                 });
 
             modelBuilder.Entity("N17Solutions.Microphobia.Domain.Tasks.TaskInfo", b =>

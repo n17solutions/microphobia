@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Postgres</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Postgres</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>N17Solutions.Microphobia.Postgres</PackageId>
@@ -20,7 +21,7 @@
     <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Data.EntityFramework\Data.EntityFramework.csproj" />

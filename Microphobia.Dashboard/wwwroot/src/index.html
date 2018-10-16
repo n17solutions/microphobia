@@ -16,13 +16,15 @@
     <body>
         <div id="app">
             <header>
-                <h1>Microphobia</h1>
-                <h2>Long Running Process Execution - Storage in Use: %(StorageInUse)</h2>
-                <h3>
-                    Current System Status:
-                    {{ systemStatus }}
-                    <i v-on:click="toggleSystemStatus()" class="fas pointer" :class="systemStatus === 'Stopped' ? 'fa-ban' : 'fa-play-circle'"></i>
-                </h3>
+                <section class="logo">
+                    <img :src="logo" />
+                </section>
+                
+                <section class="info">
+                    <h1>Microphobia</h1>
+                    <h2>Long Running Process Execution - Storage in Use: %(StorageInUse)</h2>
+                    <h3>Current Runners: {{ runners.length }}</h3>
+                </section>
             </header>
         
             <section class="swimlanes">
@@ -82,6 +84,10 @@
                 <div class="item">
                     <label>Last Updated:</label>
                     <article>{{ task.dateLastUpdated }}</article>
+                </div>
+                <div class="item">
+                    <label>Tags:</label>
+                    <article>{{ task.tags }}</article>
                 </div>
             </li>
         </script>

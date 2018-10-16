@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +23,7 @@ namespace N17Solutions.Microphobia.Tests
         {
             public void VoidMethod() => Console.WriteLine("Void Method");
             public string ResultMethod() => "Result Method";
-            public string ResultWithArgumentMethod(string arg) => $"Result With Argument Method: {arg}";
-            public async Task TaskMethod() => await Task.Run(() => Console.WriteLine("Task Method")).ConfigureAwait(false);
+            public string ResultWithArgumentMethod(string arg) => $"Result With Argument Method: {arg}";            
         }
 
         private readonly Mock<IDataProvider> _dataProviderMock = new Mock<IDataProvider>();
@@ -52,7 +53,7 @@ namespace N17Solutions.Microphobia.Tests
             await _sut.Enqueue(expression).ConfigureAwait(false);
             
             // Assert
-            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo().MethodName.Equals(info.MethodName)), It.IsAny<CancellationToken>()), Times.Once());
+            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).MethodName.Equals(info.MethodName)), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]
@@ -65,7 +66,7 @@ namespace N17Solutions.Microphobia.Tests
             await _sut.Enqueue(expression).ConfigureAwait(false);
 
             // Assert
-            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo().MethodName.Equals(info.MethodName)), It.IsAny<CancellationToken>()), Times.Once());
+            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).MethodName.Equals(info.MethodName)), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]
@@ -78,8 +79,8 @@ namespace N17Solutions.Microphobia.Tests
             await _sut.Enqueue(expression).ConfigureAwait(false);
 
             // Assert
-            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo().MethodName.Equals(info.MethodName)
-                                                                            && expression.ToTaskInfo().ReturnType == info.ReturnType),
+            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).MethodName.Equals(info.MethodName)
+                                                                            && expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).ReturnType == info.ReturnType),
                 It.IsAny<CancellationToken>()), Times.Once());
         }
 
@@ -93,9 +94,9 @@ namespace N17Solutions.Microphobia.Tests
             await _sut.Enqueue(expression).ConfigureAwait(false);
 
             // Assert
-            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo().MethodName.Equals(info.MethodName)
-                                                                            && expression.ToTaskInfo().ReturnType == info.ReturnType
-                                                                            && expression.ToTaskInfo().Arguments.Length == info.Arguments.Length),
+            _dataProviderMock.Verify(x => x.Enqueue(It.Is<TaskInfo>(info => expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).MethodName.Equals(info.MethodName)
+                                                                            && expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).ReturnType == info.ReturnType
+                                                                            && expression.ToTaskInfo(It.IsAny<IEnumerable<string>>()).Arguments.Length == info.Arguments.Length),
                 It.IsAny<CancellationToken>()), Times.Once());
         }
         
@@ -110,13 +111,23 @@ namespace N17Solutions.Microphobia.Tests
         }
 
         [Fact]
-        public async Task Dequeues_Task_Properly()
+        public async Task Dequeues_Single_Task_Properly()
+        {
+            // Act
+            await _sut.DequeueSingle().ConfigureAwait(false);
+
+            // Assert
+            _dataProviderMock.Verify(x => x.DequeueSingle(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task Dequeues_Multiple_Tasks_Properly()
         {
             // Act
             await _sut.Dequeue().ConfigureAwait(false);
-
+            
             // Assert
-            _dataProviderMock.Verify(x => x.Dequeue(It.IsAny<CancellationToken>()), Times.Once());
+            _dataProviderMock.Verify(x => x.Dequeue(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]
@@ -129,13 +140,33 @@ namespace N17Solutions.Microphobia.Tests
                 MethodName = "Test Method",
                 Status = TaskStatus.Created
             };
-            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<CancellationToken>())).ReturnsAsync(taskInfo);
+            _dataProviderMock.Setup(x => x.DequeueSingle(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(taskInfo);
 
             // Act
-            await _sut.Dequeue().ConfigureAwait(false);
+            await _sut.DequeueSingle().ConfigureAwait(false);
 
             // Assert
             _dataProviderMock.Verify(x => x.Save(It.Is<TaskInfo>(info => info.Status.Equals(TaskStatus.WaitingToRun)), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task Should_Set_Dequeued_Tasks_As_WaitingToRun()
+        {
+            // Arrange
+            const int count = 8;
+            var tasks = Enumerable.Range(1, count).Select(c => new TaskInfo
+            {
+                Id = Guid.NewGuid(),
+                MethodName = $"Test Method {c}",
+                Status = TaskStatus.Created
+            });
+            _dataProviderMock.Setup(x => x.Dequeue(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<CancellationToken>())).ReturnsAsync(tasks);
+            
+            // Act
+            await _sut.Dequeue().ConfigureAwait(false);
+            
+            // Assert
+            _dataProviderMock.Verify(x => x.Save(It.Is<TaskInfo>(info => info.Status.Equals(TaskStatus.WaitingToRun)), It.IsAny<CancellationToken>()), Times.Exactly(count));
         }
 
         [Fact]

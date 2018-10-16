@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using N17Solutions.Microphobia;
 using N17Solutions.Microphobia.Dashboard;
 using N17Solutions.Microphobia.Extensions;
 using N17Solutions.Microphobia.Postgres.Extensions;
@@ -26,14 +25,14 @@ namespace Microphobia.Dashboard.Harness.WebApi
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddScoped<InjectMe>()
-                .AddScoped<ComplicatedEnqueueMe>()
+                .AddTransient<InjectMe>()
+                .AddTransient<ComplicatedEnqueueMe>()
                 .AddMicrophobiaPostgresStorage(Configuration.GetConnectionString("Microphobia"))
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -43,15 +42,15 @@ namespace Microphobia.Dashboard.Harness.WebApi
         public void Configure(IApplicationBuilder app, IApplicationLifetime applicationLifetime, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
                 app.UseHsts();
-            }
-
-            app.UseMicrophobia();
+            
+            app.UseMicrophobia(config =>
+            {
+                config.RunnerName = "Web API";
+                config.Tag = "WebApi";
+            });
             app.UseMicrophobiaDashboard();
 
             app.UseMvc();

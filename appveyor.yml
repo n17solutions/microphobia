@@ -1,4 +1,4 @@
-version: '2.1.{build}'
+version: '3.0.{build}'
 image: Visual Studio 2017
 branches:
   only:
@@ -22,18 +22,16 @@ before_build:
   # Display minimal restore text
   - cmd: dotnet restore --verbosity m
 build_script:
-  - cmd: dotnet pack
+  - cmd: dotnet test --no-restore
+  - cmd: dotnet pack --no-restore
 deploy:
-  provider: NuGet
-  api_key:
-    secure: R29zviG5Yqpfr9G8lQEUXk9E3PLUpKJAVFNJ2YeYPhmT23+31A4fEPJ8NRJNrsKO
-  skip_symbols: true
-  artifact: /.*\.nupkg/
+ provider: NuGet
+ api_key:
+   secure: Zk9U7SmnxXAM8MaEg6ayyol0E1On4uSf1Gau9mekHKicSVe4Z8U15mJR7pdCKawX
+ skip_symbols: true
+ artifact: /.*\.nupkg/
 artifacts:
-  - path: '**\*.nupkg'
+ - path: '**\*.nupkg'
 clone_depth: 1
-test_script:
-  # Run all tests
-  - cmd: dotnet test
 on_finish:
   # Any cleanup goes here

@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using N17Solutions.Microphobia.Domain.Model;
 using N17Solutions.Microphobia.ServiceContract.Enums;
-using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.Utilities.Extensions;
 using N17Solutions.Microphobia.Utilities.Identifiers;
 using N17Solutions.Microphobia.Utilities.Serialization;
@@ -46,6 +46,12 @@ namespace N17Solutions.Microphobia.Domain.Tasks
         /// A serialised representation of this Task
         /// </summary>
         public string Data { get; set; }
+
+        /// <summary>
+        /// Any tags attributed to this Task
+        /// </summary>
+        /// <remarks>Allows distinguishing between different Task sets</remarks>
+        public string Tags { get; set; }
         
         /// <summary>
         /// Transforms the <see cref="Data" /> property of a <see cref="TaskInfo" /> domain model into a <see cref="ServiceContract.Models.TaskInfo" />
@@ -70,6 +76,7 @@ namespace N17Solutions.Microphobia.Domain.Tasks
             DateCreated = response.DateCreated;
             DateLastUpdated = response.DateLastUpdated;
             FailureDetails = response.FailureDetails;
+            Tags = response.Tags.IsDefault() ? default : string.Join(",", response.Tags);
             Data = TaskInfoSerialization.Serialize(response);
         }
 
@@ -89,7 +96,8 @@ namespace N17Solutions.Microphobia.Domain.Tasks
                 MethodName = response.MethodName,
                 ReturnType = response.ReturnType.FullName,
                 Status = response.Status,
-                FailureDetails = response.FailureDetails
+                FailureDetails = response.FailureDetails,
+                Tags = response.Tags.IsDefault() ? default : string.Join(",", response.Tags)
             };
 
             // Why don't we do this in the object initializer?

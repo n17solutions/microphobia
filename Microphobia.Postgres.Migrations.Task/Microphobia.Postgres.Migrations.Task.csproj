@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Postgres.Migrations.Task</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Postgres.Migrations.Task</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>N17Solutions.Microphobia.Postgres.Migrations.Task</PackageId>
@@ -23,6 +24,6 @@
     <ProjectReference Include="..\Data.EntityFramework\Data.EntityFramework.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.2" />
   </ItemGroup>
 </Project>

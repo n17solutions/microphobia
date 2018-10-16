@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,7 @@ using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.Utilities.Extensions;
+using Newtonsoft.Json;
 using Polly;
 // ReSharper disable SuggestBaseTypeForParameter
 
@@ -20,24 +23,26 @@ namespace N17Solutions.Microphobia
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly MicrophobiaConfiguration _config;
         private readonly ILogger _logger;
-        private readonly ISystemLogProvider _systemLogProvider;
+
+        private readonly IServiceScope _serviceScope;
+        private readonly Runners _runners; 
         
         private CancellationToken _cancellationToken;
         private uint _nothingToDequeueCount;
         private bool _cancelled;
-        
-        public Client(IServiceScopeFactory serviceScopeFactory, MicrophobiaConfiguration config, ILogger<Client> logger, ISystemLogProvider systemLogProvider)
+
+        public Client(IServiceScopeFactory serviceScopeFactory, MicrophobiaConfiguration config, ILogger<Client> logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _config = config;
             _logger = logger;
-            _systemLogProvider = systemLogProvider;
+
+            _serviceScope = serviceScopeFactory.CreateScope();
+            _runners = _serviceScope.ServiceProvider.GetRequiredService<Runners>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            SetStarted();
-
             _cancellationToken = cancellationToken;
             
             Policy
@@ -55,6 +60,8 @@ namespace N17Solutions.Microphobia
 
                     var task = Task.Run(async () =>
                     {
+                        await SetStarted();
+                        
                         while (true)
                         {
                             if (_cancellationToken.IsCancellationRequested || _cancelled)
@@ -65,38 +72,35 @@ namespace N17Solutions.Microphobia
                                 break;
                             }
 
-                            using (var scope = _serviceScopeFactory.CreateScope())
+                            var queue = _serviceScope.ServiceProvider.GetRequiredService<Queue>();
+                            var tasksToProcess = new List<TaskInfo>();
+                            
+                            if (_config.MaxThreads == 1)
+                                tasksToProcess.Add(await queue.DequeueSingle(_config.Tag, cancellationToken).ConfigureAwait(false));
+                            else
+                                tasksToProcess.AddRange(await queue.Dequeue(_config.Tag, cancellationToken: cancellationToken).ConfigureAwait(false));
+
+                            tasksToProcess.RemoveAll(t => t == null);
+                            
+                            _logger.LogInformation($"Tasks To Process: {tasksToProcess.Count}");
+                            
+                            if (tasksToProcess.IsNullOrEmpty())
                             {
-                                var queue = scope.ServiceProvider.GetRequiredService<Queue>();
-                                var nextTask = await queue.Dequeue().ConfigureAwait(false);
-                                if (nextTask != null)
-                                {
-                                    _nothingToDequeueCount = 0;
-
-                                    _logger.LogInformation($"Dequeued Task: {nextTask.Id}");
-                                    await LogTaskStarted(nextTask, queue).ConfigureAwait(false);
-
-                                    try
-                                    {
-                                        var stopWatch = new Stopwatch();
-                                        stopWatch.Start();
-
-                                        nextTask.Execute(_config.ServiceFactory, _cancellationToken);
-
-                                        stopWatch.Stop();
-                                        await LogTaskCompleted(nextTask, stopWatch.Elapsed, queue).ConfigureAwait(false);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        await LogTaskException(nextTask, ex, queue).ConfigureAwait(false);
-                                    }
-                                }
-                                else
-                                {
-                                    if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
-                                        _logger.LogInformation("Nothing to Dequeue");
-                                }
+                                if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
+                                    _logger.LogInformation("Nothing to Dequeue");
+                                
+                                OnAllTasksProcessed(new EventArgs());
                             }
+                            else
+                            {
+                                _nothingToDequeueCount = 0;
+
+                                var threadChunks = tasksToProcess.Chunk(_config.MaxThreads);
+                                foreach (var chunk in threadChunks)
+                                    await Task.WhenAll(chunk.Select(taskToProcess => ProcessTask(queue, taskToProcess))).ConfigureAwait(false);
+                            }
+                            
+                            await Task.Delay(_config.PollIntervalMs, cancellationToken).ConfigureAwait(false);
                         }
                     }, cancellationToken);
                     
@@ -109,43 +113,93 @@ namespace N17Solutions.Microphobia
             return Task.CompletedTask;
         }
 
+        private async Task ProcessTask(Queue queue, TaskInfo task)
+        {
+            _logger.LogInformation($"Dequeued Task: {task.Id}");
+            await LogTaskStarted(task, queue).ConfigureAwait(false);
+                
+            try
+            {
+                var stopWatch = new Stopwatch();
+                stopWatch.Start();
+                task.Execute(_config.ServiceFactory, _cancellationToken);
+
+                stopWatch.Stop();
+                await LogTaskCompleted(task, stopWatch.Elapsed, queue).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await LogTaskException(task, ex, queue).ConfigureAwait(false);
+            }
+
+            await _runners.MarkTaskProcessedTime(_config.RunnerName, _cancellationToken);
+        }
+
         public Task StopAsync(CancellationToken cancellationToken)
         {
             Dispose();
-            SetStopped();
-
-            return Task.CompletedTask;
+            return SetStopped();
         }
 
         public void Dispose()
         {
             _cancelled = true;
+            _serviceScope.Dispose();
+        }
+        
+        public event EventHandler AllTasksProcessed;
+
+        protected virtual void OnAllTasksProcessed(EventArgs e)
+        {
+            var handler = AllTasksProcessed;
+            handler?.Invoke(this, e);
         }
 
-        private void SetStarted()
+        private async Task SetStarted()
         {
+            var runnerName = _config.RunnerName;
+            
             _cancelled = false;
-            _config.IsRunning = true;
-            _logger.LogInformation("Microphobia Client is starting");
+            
+            await _runners.Clean(_cancellationToken).ConfigureAwait(false);
+            await _runners.Register(new QueueRunner
+            {
+                Name = runnerName,
+                IsRunning = true
+            }, _cancellationToken).ConfigureAwait(false);
+            
+            _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
         }
 
-        private void SetStopped()
+        private async Task SetStopped()
         {
-            _config.IsRunning = false;
-            _logger.LogInformation("Microphobia Client is stopping.");
+            var runnerName = _config.RunnerName;
+
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var runners = scope.ServiceProvider.GetRequiredService<Runners>();
+                await runners.Deregister(runnerName, _cancellationToken).ConfigureAwait(false);
+            }
+            
+            _logger.LogInformation($"Microphobia Client '{runnerName}' is stopping.");
         }
         
         private async Task SetFailure(Exception exception)
         {
-            var logEntryId = await _systemLogProvider.Log(new SystemLog
+            Guid logEntryId;
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                Message = exception.Message,
-                Source = exception.Source,
-                StackTrace = exception.StackTrace,
-                Level = LogLevel.Error,
-                Data = exception
-            }, _config.StorageType).ConfigureAwait(false);
-            
+                var systemLogProvider = scope.ServiceProvider.GetRequiredService<ISystemLogProvider>();
+                logEntryId = await systemLogProvider.Log(new SystemLog
+                {
+                    Message = exception.Message,
+                    Source = exception.Source,
+                    StackTrace = exception.StackTrace,
+                    Level = LogLevel.Error,
+                    Data = exception
+                }, _config.StorageType).ConfigureAwait(false);
+            }
+    
             _logger.LogCritical($"An error occurred while running the Microphobia Client and has been logged to the System Log with Resource Id: {logEntryId}");
         }
         
@@ -161,7 +215,7 @@ namespace N17Solutions.Microphobia
         {
             var logMessage = Messages.TaskFinished(taskInfo, completionTime);
             _logger.LogInformation(logMessage);
-
+            
             await queue.SetQueuedTaskCompleted(taskInfo);
         }
         

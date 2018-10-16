@@ -11,7 +11,6 @@ namespace N17Solutions.Microphobia.ServiceContract.Serialization
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            //return objectType.IsAssignableFrom(typeof(Guid)) ? serializer.Deserialize<Guid>(reader) : existingValue;
             return serializer.Deserialize(reader, objectType);
         }
 

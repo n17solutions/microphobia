@@ -16,7 +16,15 @@ body {
 
 header {
     background-color: #B59194;
-    padding: 4em;
+    display: flex;
+    align-items: center;
+}
+
+header section.logo {
+    
+}
+
+header section.info {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;

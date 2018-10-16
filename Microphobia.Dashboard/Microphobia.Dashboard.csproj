@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="BuildWebApp">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Dashboard</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Dashboard</RootNamespace>
-    <SpaRoot>wwwroot\</SpaRoot>
+    <SpaRoot>wwwroot/</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>N17Solutions.Microphobia.Dashboard</PackageId>
@@ -28,12 +29,11 @@
     <EmbeddedResource Include="$(SpaRoot)build/**" Exclude="@(EmbeddedResource)" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Humanizer" Version="2.4.2" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
@@ -42,13 +42,18 @@
   <ItemGroup>
     <ProjectReference Include="..\Microphobia\Microphobia.csproj" />
   </ItemGroup>
-  <Target Name="BuildWebApp">
+  <Target Name="CleanWebApp" AfterTargets="AfterBuild">
+    <RemoveDir Directories="$(SpaRoot)build" />
+  </Target>
+  <Target Name="BuildWebApp" AfterTargets="CleanWebApp">
     <Exec Command="node --version" ContinueOnError="true">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run the WebApp. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt, terminal or IDE." />
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Message Importance="high" Text="Cleaning WebApp..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run clean" />
     <Message Importance="high" Text="Building WebApp..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
   </Target>

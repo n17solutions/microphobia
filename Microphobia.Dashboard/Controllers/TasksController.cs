@@ -13,7 +13,7 @@ namespace N17Solutions.Microphobia.Dashboard.Controllers
     {
         private readonly IDataProvider _dataProvider;
         private readonly MicrophobiaHubContext _hubContext;
-        
+
         public TasksController(IDataProvider dataProvider, MicrophobiaHubContext hubContext)
         {
             _dataProvider = dataProvider;
@@ -23,7 +23,8 @@ namespace N17Solutions.Microphobia.Dashboard.Controllers
         [HttpGet]
         public async Task<IActionResult> ListTasks()
         {
-            var tasks = (await _dataProvider.GetTasks())
+            // Only get tasks for the past 30 days
+            var tasks = (await _dataProvider.GetTasks(DateTime.UtcNow.AddDays(-30)))
                 .Select(task => new TaskInfoReadModel(task));
 
             return Ok(tasks);

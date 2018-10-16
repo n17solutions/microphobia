@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Dashboard.Harness.Console</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Dashboard.Harness.Console</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microphobia.Dashboard\Microphobia.Dashboard.csproj" />

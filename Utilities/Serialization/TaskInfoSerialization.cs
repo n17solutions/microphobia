@@ -1,5 +1,4 @@
-﻿using System;
-using N17Solutions.Microphobia.ServiceContract.Models;
+﻿using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Serialization;
 using Newtonsoft.Json;
 

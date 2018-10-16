@@ -18,13 +18,20 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
         public const string PostgresTaskContextHistoryTableName = "__MicrophobiaTaskContextMigrationsHistory";
         public const string PostgresSystemLogContextHistoryTableName = "__MicrophobiaSystemLogContextHistory";
         
+        private static readonly string CurrentAssemblyName = typeof(ServiceCollectionExtensions).Assembly.GetName().Name;
+        
         public static IServiceCollection AddMicrophobiaPostgresStorage(this IServiceCollection services, string connectionString, ServiceFactory serviceFactory = null)
         {
             Migrate(connectionString);
 
-            services
+            /*services
                 .AddDbContext<TaskContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Transient)
                 .AddDbContext<SystemLogContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Transient)
+                .AddEntityFramework()
+                .AddMicrophobia();*/
+            services
+                .AddDbContext<TaskContext>(options => options.UseNpgsql(connectionString, npgsqlOptions => { npgsqlOptions.MigrationsAssembly(CurrentAssemblyName); }), ServiceLifetime.Transient)
+                .AddDbContext<SystemLogContext>(options => options.UseNpgsql(connectionString, npgsqlOptions => { npgsqlOptions.MigrationsAssembly(CurrentAssemblyName); }), ServiceLifetime.Transient)
                 .AddEntityFramework()
                 .AddMicrophobia();
             
@@ -39,8 +46,6 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
 
         private static void Migrate(string connectionString)
         {
-            var currentAssemblyName = typeof(ServiceCollectionExtensions).Assembly.GetName().Name;
-
             void MigrateTaskContext()
             {
                 try
@@ -50,7 +55,7 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
                             db =>
                             {
                                 db.MigrationsHistoryTable(PostgresTaskContextHistoryTableName, Schema.MicrophobiaSchemaName);
-                                db.MigrationsAssembly($"{currentAssemblyName}.Migrations.Task");
+                                db.MigrationsAssembly($"{CurrentAssemblyName}.Migrations.Task");
                             })
                         .Options;
 
@@ -74,7 +79,7 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
                             db =>
                             {
                                 db.MigrationsHistoryTable(PostgresSystemLogContextHistoryTableName, Schema.MicrophobiaSchemaName);
-                                db.MigrationsAssembly($"{currentAssemblyName}.Migrations.SystemLog");
+                                db.MigrationsAssembly($"{CurrentAssemblyName}.Migrations.SystemLog");
                             })
                         .Options;
 

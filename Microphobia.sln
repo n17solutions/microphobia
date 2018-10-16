@@ -39,9 +39,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microphobia.Dashboard.Harne
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{842E9178-7B54-428A-A391-574253B96B18}"
 ProjectSection(SolutionItems) = preProject
-	appveyor.yml = appveyor.yml
 	Directory.Build.targets = Directory.Build.targets
 	after.Microphobia.sln.targets = after.Microphobia.sln.targets
+	appveyor.yml = appveyor.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microphobia.Postgres.Migrations.Task", "Microphobia.Postgres.Migrations.Task\Microphobia.Postgres.Migrations.Task.csproj", "{3F426812-FE2D-4F19-8979-919A18BAA02C}"

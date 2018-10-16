@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Humanizer;
 using N17Solutions.Microphobia.ServiceContract.Models;
 
@@ -17,6 +16,7 @@ namespace N17Solutions.Microphobia.Dashboard.Models
         public string DateCreated { get; }
         public string DateLastUpdated { get; }
         public string FailureDetails { get; }
+        public string Tags { get; }
 
         public TaskInfoReadModel(TaskInfo taskInfo)
         {
@@ -30,6 +30,7 @@ namespace N17Solutions.Microphobia.Dashboard.Models
             DateCreated = taskInfo.DateCreated.Humanize();
             DateLastUpdated = taskInfo.DateLastUpdated.Humanize();
             FailureDetails = taskInfo.FailureDetails;
+            Tags = taskInfo.Tags == null ? null : string.Join(", ", taskInfo.Tags);
         }
     }
 }

@@ -70,9 +70,9 @@ module.exports = {
 
   plugins: [
       new FaviconsWebpackPlugin({
-          logo: 'logo.png',
-          prefix: '/favicons/[hash]-',
-          persistentCache: true,
+          logo: './src/images/logo.png',
+          prefix: './favicons/[hash]-',
+          persistentCache: false,
           inject: true,
           title: 'Microphobia'
       }),

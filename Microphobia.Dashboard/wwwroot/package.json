@@ -1,11 +1,12 @@
 {
-  "name": "Microphobia.Dashboard",
+  "name": "microphobia.dashboard",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf ./build",
     "build": "rimraf ./build && cross-env NODE_ENV=\"production\" webpack"
   },
   "keywords": [],

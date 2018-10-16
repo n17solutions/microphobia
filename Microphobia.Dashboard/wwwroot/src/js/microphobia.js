@@ -1,5 +1,6 @@
 import clockImage from '../images/clock.gif';
 import clockSvg from '../images/clock.svg'
+import logo from '../images/logo.png';
 
 import * as signalR from '@aspnet/signalr';
 
@@ -8,17 +9,16 @@ const TASK_STATUS_WAITINGTORUN = 2;
 const TASK_STATUS_RUNNING = 3;
 const TASK_STATUS_COMPLETED = 5;
 const TASK_STATUS_FAULTED = 7;
-const SYSTEM_STATUS_RUNNING = 'Running';
-const SYSTEM_STATUS_STOPPED = 'Stopped';
 
 const vm = new Vue({
     el: '#app',
     data: {
         clockImage,
         clockSvg,
+        logo,
         currentTask: {},
         tasks: [],
-        systemStatus: '',
+        runners: [],
         openTaskModal: false
     },
     components: {
@@ -62,15 +62,15 @@ const vm = new Vue({
                 });
         };
         
-        const systemStatusFetcher = () => {
-            axios.get('./api/systemstatus')
+        const runnerFetcher = () => {
+            axios.get('./api/runners')
                 .then(response => {
-                    this.systemStatus = !!response.data ? SYSTEM_STATUS_RUNNING : SYSTEM_STATUS_STOPPED  
+                    this.runners = response.data; 
                 });
         };
         
         taskFetcher();
-        systemStatusFetcher();
+        runnerFetcher();
         
         const connection = new signalR.HubConnectionBuilder()
             .withUrl('/microphobia/microphobiahub')
@@ -79,10 +79,6 @@ const vm = new Vue({
         
         connection.on('RefreshTasks', () => {
             taskFetcher();
-        });
-        
-        connection.on('RefreshSystemStatus', () => {
-            systemStatusFetcher(); 
         });
         
         connection.start().catch(err => console.error(err.toString()));
@@ -128,12 +124,6 @@ const vm = new Vue({
         hideTaskModal: function () {
             this.currentTask = {};
             this.openTaskModal = false;
-        },
-        toggleSystemStatus: function () {
-            if (this.systemStatus === SYSTEM_STATUS_STOPPED)
-                axios.put('./api/systemstatus/start');
-            else
-                axios.put('./api/systemstatus/stop')
         }
     }
 });

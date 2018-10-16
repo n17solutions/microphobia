@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
@@ -20,30 +23,39 @@ namespace N17Solutions.Microphobia
             _taskHubContext = taskHubContext;
         }
 
-        public Task Enqueue(Expression<Action> expression)
+        public Task Enqueue(Expression<Action> expression, IEnumerable<string> tags = default)
         {
-            var taskInfo = expression.ToTaskInfo();
+            var taskInfo = expression.ToTaskInfo(tags);
             return Enqueue(taskInfo);
         }
 
-        public Task Enqueue<TExecutor>(Expression<Action<TExecutor>> expression)
+        public Task Enqueue<TExecutor>(Expression<Action<TExecutor>> expression, IEnumerable<string> tags = default)
         {
-            var taskInfo = expression.ToTaskInfo();
+            var taskInfo = expression.ToTaskInfo(tags);
             return Enqueue(taskInfo);
         }
         
-        public async Task<TaskInfo> Dequeue()
+        public async Task<TaskInfo> DequeueSingle(string tag = default, CancellationToken cancellationToken = default)
         {
-            var dequeuedTask = await _dataProvider.Dequeue().ConfigureAwait(false);
+            var dequeuedTask = await _dataProvider.DequeueSingle(tag, cancellationToken).ConfigureAwait(false);
             await SetQueuedTaskWaitingToRun(dequeuedTask).ConfigureAwait(false);
 
             return dequeuedTask;
+        }
+        
+        public async Task<IEnumerable<TaskInfo>> Dequeue(string tag = default, int? limit = null, CancellationToken cancellationToken = default)
+        {
+            var dequeuedTasks = await _dataProvider.Dequeue(tag, limit, cancellationToken).ConfigureAwait(false);
+            var taskInfos = dequeuedTasks as TaskInfo[] ?? dequeuedTasks.ToArray();
+            await Task.WhenAll(taskInfos.Select(SetQueuedTaskWaitingToRun)).ConfigureAwait(false);
+
+            return taskInfos;
         }
 
         public Task SetQueuedTaskRunning(TaskInfo task) => SetQueuedTaskStatus(task, TaskStatus.Running);
 
         public Task SetQueuedTaskCompleted(TaskInfo task) => SetQueuedTaskStatus(task, TaskStatus.RanToCompletion);
-
+        
         public Task SetQueuedTaskWaitingToRun(TaskInfo task) => SetQueuedTaskStatus(task, TaskStatus.WaitingToRun);
 
         public Task SetQueuedTaskFaulted(TaskInfo task, Exception ex)
