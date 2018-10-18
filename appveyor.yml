@@ -19,6 +19,8 @@ install:
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
+  # Build JS Webapps
+  - cmd: dotnet msbuild Microphobia.Dashboard -t:BuildWebApp
 build_script:
   - cmd: dotnet build --verbosity m
   - cmd: dotnet test --no-restore --no-build
