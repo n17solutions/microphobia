@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.PlatformAbstractions;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
 
 namespace N17Solutions.Microphobia.Dashboard
@@ -84,7 +85,8 @@ namespace N17Solutions.Microphobia.Dashboard
             return new Dictionary<string, string>
             {
                 {"%(DocumentTitle)", _options.DocumentTitle},
-                {"%(StorageInUse)", _config.StorageType.ToString()}
+                {"%(StorageInUse)", _config.StorageType.ToString()},
+                {"%(AssemblyVersion)", PlatformServices.Default.Application.ApplicationVersion}
             };
         }
         

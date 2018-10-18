@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="BuildWebApp">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Dashboard</AssemblyName>
@@ -37,23 +37,19 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microphobia\Microphobia.csproj" />
   </ItemGroup>
-  <Target Name="CleanWebApp" AfterTargets="AfterBuild">
-    <RemoveDir Directories="$(SpaRoot)build" />
-  </Target>
-  <Target Name="BuildWebApp" AfterTargets="CleanWebApp">
+  <Target Name="BuildWebApp">
     <Exec Command="node --version" ContinueOnError="true">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run the WebApp. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt, terminal or IDE." />
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-    <Message Importance="high" Text="Cleaning WebApp..." />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run clean" />
     <Message Importance="high" Text="Building WebApp..." />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
   </Target>
