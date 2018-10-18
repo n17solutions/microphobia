@@ -19,10 +19,8 @@ install:
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
-  # Display minimal restore text
-  - cmd: dotnet restore --verbosity m
 build_script:
-  - cmd: dotnet build --no-restore
+  - cmd: dotnet build --verbosity m
   - cmd: dotnet test --no-restore --no-build
   - cmd: dotnet pack --no-restore --no-build
 deploy:
