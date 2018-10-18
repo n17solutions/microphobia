@@ -22,8 +22,9 @@ namespace N17Solutions.Microphobia.Dashboard
         /// <remarks>Used when hosting in a stand-alone environment</remarks>
         public Uri DashboardUri { get; set; } = new Uri("http://0.0.0.0:5000");
         
-        //public Func<Stream> IndexStream { get; set; } = () => typeof(SwaggerUIOptions).GetTypeInfo().Assembly
-        //.GetManifestResourceStream("Swashbuckle.AspNetCore.SwaggerUI.index.html");
-        public Func<Stream> IndexStream { get; set; } = () => typeof(MicrophobiaDashboardOptions).GetTypeInfo().Assembly.GetManifestResourceStream("N17Solutions.Microphobia.Dashboard.wwwroot.build.index.html");
+        /// <summary>
+        /// The Stream to use to render the index page.
+        /// </summary>
+        public static Stream IndexStream => typeof(MicrophobiaDashboardOptions).GetTypeInfo().Assembly.GetManifestResourceStream("N17Solutions.Microphobia.Dashboard.wwwroot.build.index.html");
     }
 }

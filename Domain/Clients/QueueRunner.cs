@@ -38,7 +38,8 @@ namespace N17Solutions.Microphobia.Domain.Clients
                 Name = runner.Name,
                 IsRunning = runner.IsRunning,
                 LastTaskProcessed = runner.LastTaskProcessed,
-                DateRegistered = runner.DateRegistered
+                DateRegistered = runner.DateRegistered,
+                Tag = runner.Tag
             };
 
             return queueRunner;
@@ -54,7 +55,8 @@ namespace N17Solutions.Microphobia.Domain.Clients
                     Name = domainModel.Name,
                     IsRunning = domainModel.IsRunning,
                     LastTaskProcessed = domainModel.LastTaskProcessed,
-                    DateRegistered = domainModel.DateRegistered
+                    DateRegistered = domainModel.DateRegistered,
+                    Tag = domainModel.Tag
                 };
     }
 }

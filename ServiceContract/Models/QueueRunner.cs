@@ -23,5 +23,10 @@ namespace N17Solutions.Microphobia.ServiceContract.Models
         /// The Date this Runner was registered
         /// </summary>
         public DateTime DateRegistered { get; set; } = DateTime.UtcNow;
+        
+        /// <summary>
+        /// Any tags this runner is processing
+        /// </summary>
+        public string Tag { get; set; }
     }
 }

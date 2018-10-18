@@ -62,7 +62,7 @@ namespace N17Solutions.Microphobia.Dashboard
                     httpContext.Response.StatusCode = 200;
                     httpContext.Response.ContentType = "text/html";
 
-                    using (var stream = _options.IndexStream())
+                    using (var stream = MicrophobiaDashboardOptions.IndexStream)
                     {
                         var html = await new StreamReader(stream).ReadToEndAsync();
                         var htmlBuilder = new StringBuilder(html);
