@@ -85,8 +85,7 @@ namespace N17Solutions.Microphobia.Dashboard
             return new Dictionary<string, string>
             {
                 {"%(DocumentTitle)", _options.DocumentTitle},
-                {"%(StorageInUse)", _config.StorageType.ToString()},
-                {"%(AssemblyVersion)", PlatformServices.Default.Application.ApplicationVersion}
+                {"%(StorageInUse)", _config.StorageType.ToString()}
             };
         }
         

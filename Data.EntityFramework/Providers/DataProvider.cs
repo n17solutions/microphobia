@@ -116,16 +116,26 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
             await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task RegisterQueueRunner(QueueRunner queueRunner, CancellationToken cancellationToken = default)
+        public async Task<int> RegisterQueueRunner(QueueRunner queueRunner, CancellationToken cancellationToken = default)
         {
+            var existingRunners = await _context.Runners.Where(runner => runner.Name.StartsWith(queueRunner.Name, StringComparison.InvariantCultureIgnoreCase))
+                .ToArrayAsync(cancellationToken)
+                .ConfigureAwait(false);
+
             var newRunner = Domain.Clients.QueueRunner.FromQueueRunnerResponse(queueRunner);
+            newRunner.UniqueIndexer = existingRunners.Length + 1;
+
             await _context.Runners.AddAsync(newRunner, cancellationToken).ConfigureAwait(false);
             await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            return newRunner.UniqueIndexer;
         }
 
-        public async Task DeregisterQueueRunner(string name, CancellationToken cancellationToken = default)
+        public async Task DeregisterQueueRunner(string name, int uniqueIndexer, CancellationToken cancellationToken = default)
         {
-            var runner = await _context.Runners.FirstOrDefaultAsync(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase), cancellationToken).ConfigureAwait(false);
+            var runner = await _context.Runners.FirstOrDefaultAsync(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) && r.UniqueIndexer.Equals(uniqueIndexer), cancellationToken)
+                .ConfigureAwait(false);
+            
             if (runner != null)
             {
                 _context.Runners.Remove(runner);

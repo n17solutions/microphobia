@@ -25,8 +25,15 @@ namespace N17Solutions.Microphobia.ServiceContract.Configuration
         public int StopLoggingNothingToQueueAfter { get; set; } = 3;
 
         public string RunnerName { get; set; } = Guid.NewGuid().ToString("N");
+        
+        public int RunnerIndexer { get; private set; }
 
         public string Tag { get; set; }
+
+        public void SetRunnerIndexer(int indexer)
+        {
+            RunnerIndexer = indexer;
+        }
         
         private static int DiscoverMaxThreads()
         {

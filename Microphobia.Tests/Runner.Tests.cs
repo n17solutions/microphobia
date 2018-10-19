@@ -45,10 +45,10 @@ namespace N17Solutions.Microphobia.Tests
         public async Task Should_Call_DataProvider_Deregister_Runner_Method()
         {
             // Act
-            await _sut.Deregister("Test").ConfigureAwait(false);
+            await _sut.Deregister("Test", 1).ConfigureAwait(false);
             
             // Assert
-            _dataProviderMock.Verify(x => x.DeregisterQueueRunner(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
+            _dataProviderMock.Verify(x => x.DeregisterQueueRunner(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact]

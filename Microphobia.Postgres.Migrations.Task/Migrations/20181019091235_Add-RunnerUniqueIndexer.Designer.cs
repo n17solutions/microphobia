@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using N17Solutions.Microphobia.Data.EntityFramework.Contexts;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -9,9 +10,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace N17Solutions.Microphobia.Postgres.Migrations.Task.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    partial class TaskContextModelSnapshot : ModelSnapshot
+    [Migration("20181019091235_Add-RunnerUniqueIndexer")]
+    partial class AddRunnerUniqueIndexer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

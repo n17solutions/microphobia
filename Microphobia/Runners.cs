@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,14 +20,14 @@ namespace N17Solutions.Microphobia
             _config = config;
         }
 
-        public Task Register(QueueRunner runner, CancellationToken cancellationToken = default)
+        public Task<int> Register(QueueRunner runner, CancellationToken cancellationToken = default)
         {
             return _dataProvider.RegisterQueueRunner(runner, cancellationToken);
         }
 
-        public Task Deregister(string name, CancellationToken cancellationToken = default)
+        public Task Deregister(string name, int uniqueIndexer, CancellationToken cancellationToken = default)
         {
-            return _dataProvider.DeregisterQueueRunner(name, cancellationToken);
+            return _dataProvider.DeregisterQueueRunner(name, uniqueIndexer, cancellationToken);
         }
 
         public Task MarkTaskProcessedTime(string runnerName = default, CancellationToken cancellationToken = default)

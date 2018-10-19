@@ -65,14 +65,16 @@ namespace N17Solutions.Microphobia.ServiceContract.Providers
         /// </summary>
         /// <param name="runner">The runner to register.</param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
-        Task RegisterQueueRunner(QueueRunner runner, CancellationToken cancellationToken = default);
+        /// <returns>The unique indexer of this Queue Runner</returns> 
+        Task<int> RegisterQueueRunner(QueueRunner runner, CancellationToken cancellationToken = default);
         
         /// <summary>
         /// De-registers a Queue Runner from the system.
         /// </summary>
         /// <param name="name">The name of the runner to de-register.</param>
+        /// <param name="uniqueIndexer">The indexer of the runner to de-register.</param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
-        Task DeregisterQueueRunner(string name, CancellationToken cancellationToken = default);
+        Task DeregisterQueueRunner(string name, int uniqueIndexer, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// De-registers multiple Queue Runners from the system.

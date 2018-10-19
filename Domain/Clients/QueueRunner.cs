@@ -27,6 +27,11 @@ namespace N17Solutions.Microphobia.Domain.Clients
         public DateTime? LastTaskProcessed { get; set; }
         
         /// <summary>
+        /// If there are multiple runners with the same name, this is used to differentiate
+        /// </summary>
+        public int UniqueIndexer { get; set; }
+        
+        /// <summary>
         /// The Date this Runner was registered
         /// </summary>
         public DateTime DateRegistered { get; set; }

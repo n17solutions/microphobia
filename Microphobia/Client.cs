@@ -162,11 +162,12 @@ namespace N17Solutions.Microphobia
             _cancelled = false;
             
             await _runners.Clean(_cancellationToken).ConfigureAwait(false);
-            await _runners.Register(new QueueRunner
+            var uniqueIndexer = await _runners.Register(new QueueRunner
             {
                 Name = runnerName,
                 IsRunning = true
             }, _cancellationToken).ConfigureAwait(false);
+            _config.SetRunnerIndexer(uniqueIndexer);
             
             _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
         }
@@ -174,11 +175,12 @@ namespace N17Solutions.Microphobia
         private async Task SetStopped()
         {
             var runnerName = _config.RunnerName;
+            var runnerUniqueIndexer = _config.RunnerIndexer;
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var runners = scope.ServiceProvider.GetRequiredService<Runners>();
-                await runners.Deregister(runnerName, _cancellationToken).ConfigureAwait(false);
+                await runners.Deregister(runnerName, runnerUniqueIndexer, _cancellationToken).ConfigureAwait(false);
             }
             
             _logger.LogInformation($"Microphobia Client '{runnerName}' is stopping.");
