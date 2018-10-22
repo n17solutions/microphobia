@@ -369,7 +369,7 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
             await _context.SaveChangesAsync().ConfigureAwait(false);
             
             // Act
-            await _sut.DeregisterQueueRunner(name, indexer, CancellationToken.None).ConfigureAwait(false);
+            await _sut.DeregisterQueueRunner(name, ConfigTag, indexer, CancellationToken.None).ConfigureAwait(false);
             
             // Assert
             (await _context.Runners.FirstOrDefaultAsync(r => r.Name == name).ConfigureAwait(false)).ShouldBeNull();
@@ -380,9 +380,10 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
         {
             // Arrange
             const string name = "Test Runner";
+            const string tag = "Test Tag";
             
             // Act
-            await _sut.DeregisterQueueRunner(name, 1, CancellationToken.None).ConfigureAwait(false);
+            await _sut.DeregisterQueueRunner(name, tag, 1, CancellationToken.None).ConfigureAwait(false);
             
             // Assert
             (await _context.Runners.FirstOrDefaultAsync(r => r.Name == name).ConfigureAwait(false)).ShouldBeNull();

@@ -25,9 +25,9 @@ namespace N17Solutions.Microphobia
             return _dataProvider.RegisterQueueRunner(runner, cancellationToken);
         }
 
-        public Task Deregister(string name, int uniqueIndexer, CancellationToken cancellationToken = default)
+        public Task Deregister(string name, string tag, int uniqueIndexer, CancellationToken cancellationToken = default)
         {
-            return _dataProvider.DeregisterQueueRunner(name, uniqueIndexer, cancellationToken);
+            return _dataProvider.DeregisterQueueRunner(name, tag, uniqueIndexer, cancellationToken);
         }
 
         public Task MarkTaskProcessedTime(string runnerName = default, CancellationToken cancellationToken = default)

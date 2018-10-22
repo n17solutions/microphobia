@@ -118,9 +118,14 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
 
         public async Task<int> RegisterQueueRunner(QueueRunner queueRunner, CancellationToken cancellationToken = default)
         {
-            var existingRunners = await _context.Runners.Where(runner => runner.Name.StartsWith(queueRunner.Name, StringComparison.InvariantCultureIgnoreCase))
+            var tag = queueRunner.Tag ?? _config.Tag;
+            var existingRunners = await _context.Runners
+                .Where(runner => runner.Name.StartsWith(queueRunner.Name, StringComparison.InvariantCultureIgnoreCase) && runner.Tag.Equals(tag, StringComparison.InvariantCultureIgnoreCase))
                 .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
+
+            // Merge the config tag with the queue runner data if necessary.
+            queueRunner.Tag = queueRunner.Tag ?? _config.Tag;
 
             var newRunner = Domain.Clients.QueueRunner.FromQueueRunnerResponse(queueRunner);
             newRunner.UniqueIndexer = existingRunners.Length + 1;
@@ -131,9 +136,12 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
             return newRunner.UniqueIndexer;
         }
 
-        public async Task DeregisterQueueRunner(string name, int uniqueIndexer, CancellationToken cancellationToken = default)
+        public async Task DeregisterQueueRunner(string name, string tag, int uniqueIndexer, CancellationToken cancellationToken = default)
         {
-            var runner = await _context.Runners.FirstOrDefaultAsync(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) && r.UniqueIndexer.Equals(uniqueIndexer), cancellationToken)
+            var runner = await _context.Runners
+                .FirstOrDefaultAsync(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                                          r.Tag.Equals(tag, StringComparison.InvariantCultureIgnoreCase) &&
+                                          r.UniqueIndexer.Equals(uniqueIndexer), cancellationToken)
                 .ConfigureAwait(false);
             
             if (runner != null)

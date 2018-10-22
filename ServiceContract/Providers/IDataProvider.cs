@@ -72,9 +72,10 @@ namespace N17Solutions.Microphobia.ServiceContract.Providers
         /// De-registers a Queue Runner from the system.
         /// </summary>
         /// <param name="name">The name of the runner to de-register.</param>
+        /// <param name="tag">The tag that this runner was assigned.</param>
         /// <param name="uniqueIndexer">The indexer of the runner to de-register.</param>
         /// <param name="cancellationToken">Any <see cref="CancellationToken" /> to use alongside this request.</param>
-        Task DeregisterQueueRunner(string name, int uniqueIndexer, CancellationToken cancellationToken = default);
+        Task DeregisterQueueRunner(string name, string tag, int uniqueIndexer, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// De-registers multiple Queue Runners from the system.
