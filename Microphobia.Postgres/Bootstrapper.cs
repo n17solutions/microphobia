@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using N17Solutions.Microphobia.Postgres.Extensions;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Enums;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
@@ -11,15 +12,19 @@ namespace N17Solutions.Microphobia.Postgres
 {
     public static class Bootstrapper
     {
-        public static IServiceCollection Strap(string connectionString, ServiceFactory serviceFactory = null)
+        public static IServiceCollection Strap(string connectionString, ServiceFactory serviceFactory = null, Action<MicrophobiaConfiguration> configAction = null)
         {
             var microphobiaServices = new ServiceCollection();
             microphobiaServices.AddMicrophobiaPostgresStorage(connectionString, serviceFactory);
+            
+            var serviceProvider = microphobiaServices.BuildServiceProvider();
+
+            var config = serviceProvider.GetService<MicrophobiaConfiguration>();
+            configAction?.Invoke(config);
 
             AppDomain.CurrentDomain.UnhandledException += async (sender, args) =>
             {
                 var exception = args.ExceptionObject as Exception;
-                var serviceProvider = microphobiaServices.BuildServiceProvider();
                 var systemLogger = serviceProvider.GetRequiredService<ISystemLogProvider>();
 
                 Console.WriteLine("LOGGING ERROR");
