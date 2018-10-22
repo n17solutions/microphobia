@@ -42,6 +42,7 @@ ProjectSection(SolutionItems) = preProject
 	Directory.Build.targets = Directory.Build.targets
 	after.Microphobia.sln.targets = after.Microphobia.sln.targets
 	appveyor.yml = appveyor.yml
+	README.md = README.md
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microphobia.Postgres.Migrations.Task", "Microphobia.Postgres.Migrations.Task\Microphobia.Postgres.Migrations.Task.csproj", "{3F426812-FE2D-4F19-8979-919A18BAA02C}"
