@@ -120,12 +120,12 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
         {
             var tag = queueRunner.Tag ?? _config.Tag;
             var existingRunners = await _context.Runners
-                .Where(runner => runner.Name.StartsWith(queueRunner.Name, StringComparison.InvariantCultureIgnoreCase) && runner.Tag.Equals(tag, StringComparison.InvariantCultureIgnoreCase))
+                .Where(runner => runner.Name.StartsWith(queueRunner.Name, StringComparison.InvariantCultureIgnoreCase) && runner.Tag == tag)
                 .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             // Merge the config tag with the queue runner data if necessary.
-            queueRunner.Tag = queueRunner.Tag ?? _config.Tag;
+            queueRunner.Tag = tag;
 
             var newRunner = Domain.Clients.QueueRunner.FromQueueRunnerResponse(queueRunner);
             newRunner.UniqueIndexer = existingRunners.Length + 1;
@@ -140,7 +140,7 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
         {
             var runner = await _context.Runners
                 .FirstOrDefaultAsync(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
-                                          r.Tag.Equals(tag, StringComparison.InvariantCultureIgnoreCase) &&
+                                          r.Tag == tag &&
                                           r.UniqueIndexer.Equals(uniqueIndexer), cancellationToken)
                 .ConfigureAwait(false);
             

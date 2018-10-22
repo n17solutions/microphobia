@@ -348,7 +348,7 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
             {
                 Name = "Test Runner"
             };
-            await _context.Runners.AddAsync(new Domain.Clients.QueueRunner {Name = runner.Name}).ConfigureAwait(false);
+            await _context.Runners.AddAsync(new Domain.Clients.QueueRunner {Name = runner.Name, Tag = ConfigTag}).ConfigureAwait(false);
             await _context.SaveChangesAsync().ConfigureAwait(false);
             
             // Act
@@ -365,7 +365,7 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Tests.Providers
             // Arrange
             const string name = "Test Runner";
             const int indexer = 1;
-            await _context.Runners.AddAsync(new Domain.Clients.QueueRunner {Name = name, UniqueIndexer = indexer}).ConfigureAwait(false);
+            await _context.Runners.AddAsync(new Domain.Clients.QueueRunner {Name = name, UniqueIndexer = indexer, Tag = ConfigTag}).ConfigureAwait(false);
             await _context.SaveChangesAsync().ConfigureAwait(false);
             
             // Act
