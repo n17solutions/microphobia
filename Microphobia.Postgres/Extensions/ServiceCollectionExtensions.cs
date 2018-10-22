@@ -20,7 +20,8 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
         
         private static readonly string CurrentAssemblyName = typeof(ServiceCollectionExtensions).Assembly.GetName().Name;
         
-        public static IServiceCollection AddMicrophobiaPostgresStorage(this IServiceCollection services, string connectionString, ServiceFactory serviceFactory = null)
+        public static IServiceCollection AddMicrophobiaPostgresStorage(this IServiceCollection services, string connectionString, ServiceFactory serviceFactory = null,
+            Action<MicrophobiaConfiguration> configAction = null)
         {
             Migrate(connectionString);
 
@@ -30,10 +31,17 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
                 .AddEntityFramework()
                 .AddMicrophobia();
             
-            services.AddSingleton(serviceProvider => new MicrophobiaConfiguration(serviceProvider.GetRequiredService<MicrophobiaHubContext>())
+            services.AddSingleton(serviceProvider =>
             {
-                StorageType = Storage.Postgres,
-                ServiceFactory = serviceFactory ?? serviceProvider.GetService
+                var configuration = new MicrophobiaConfiguration(serviceProvider.GetRequiredService<MicrophobiaHubContext>())
+                {
+                    StorageType = Storage.Postgres,
+                    ServiceFactory = serviceFactory ?? serviceProvider.GetService
+                };
+                
+                configAction?.Invoke(configuration);
+
+                return configuration;
             });
             
             return services;
