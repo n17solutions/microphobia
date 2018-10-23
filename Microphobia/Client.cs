@@ -158,27 +158,19 @@ namespace N17Solutions.Microphobia
 
         private async Task SetStarted()
         {
-            try
+            var runnerName = _config.RunnerName;
+
+            _cancelled = false;
+
+            await _runners.Clean(_cancellationToken).ConfigureAwait(false);
+            var uniqueIndexer = await _runners.Register(new QueueRunner
             {
-                var runnerName = _config.RunnerName;
+                Name = runnerName,
+                IsRunning = true
+            }, _cancellationToken).ConfigureAwait(false);
+            _config.SetRunnerIndexer(uniqueIndexer);
 
-                _cancelled = false;
-
-                await _runners.Clean(_cancellationToken).ConfigureAwait(false);
-                var uniqueIndexer = await _runners.Register(new QueueRunner
-                {
-                    Name = runnerName,
-                    IsRunning = true
-                }, _cancellationToken).ConfigureAwait(false);
-                _config.SetRunnerIndexer(uniqueIndexer);
-
-                _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("An Error Occurred");
-                Console.WriteLine(ex.Message);
-            }
+            _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
         }
 
         private async Task SetStopped()
