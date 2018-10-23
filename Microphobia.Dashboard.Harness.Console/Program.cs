@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using N17Solutions.Microphobia.Postgres.Extensions;
 using N17Solutions.Microphobia.Utilities.Configuration;
-using Newtonsoft.Json;
 using PostgresBootstrapper = N17Solutions.Microphobia.Postgres.Bootstrapper;
 using DashboardBootstrapper = N17Solutions.Microphobia.Dashboard.Bootstrapper;
 
@@ -15,35 +14,27 @@ namespace N17Solutions.Microphobia.Dashboard.Harness.Console
         public static void EnqueueMe() => System.Console.WriteLine("HELLO!");
     }
     
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            IServiceProvider serviceProvider = null;
+            var configuration = new ConfigurationManager(new ConfigurationBuilder());
+            var connectionString = configuration.GetConnectionString("Microphobia");
             
-            var exitEvent = new ManualResetEvent(false);
+            var builder = new HostBuilder()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddMicrophobiaPostgresStorage(connectionString, configAction: config =>
+                    {
+                        config.Tag = "Console Tag";
+                        config.RunnerName = "Console Runner";
+                    });
+
+                    var serviceProvider = services.BuildServiceProvider();
+                    DashboardBootstrapper.Strap(serviceProvider);
+                });
             
-            System.Console.CancelKeyPress += (sender, eventArgs) =>
-            {
-                eventArgs.Cancel = true;
-                exitEvent.Set();
-            };
-
-            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => { exitEvent.Set(); };
-            
-            var task = Task.Run(() =>
-            {
-                var configuration = new ConfigurationManager(new ConfigurationBuilder());
-                var services = PostgresBootstrapper.Strap(configuration.GetConnectionString("Microphobia"));
-                serviceProvider = services.BuildServiceProvider();
-                
-                DashboardBootstrapper.Strap(serviceProvider);
-            });
-
-            task.ContinueWith(t => System.Console.WriteLine($"An error occurred.{Environment.NewLine}{JsonConvert.SerializeObject(t.Exception)}"), TaskContinuationOptions.OnlyOnFaulted);
-
-            exitEvent.WaitOne();
-            System.Console.WriteLine("Exiting");
+            await builder.RunConsoleAsync();
         }
     }
 }
