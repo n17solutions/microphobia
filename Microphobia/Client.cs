@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -157,19 +158,27 @@ namespace N17Solutions.Microphobia
 
         private async Task SetStarted()
         {
-            var runnerName = _config.RunnerName;
-            
-            _cancelled = false;
-            
-            await _runners.Clean(_cancellationToken).ConfigureAwait(false);
-            var uniqueIndexer = await _runners.Register(new QueueRunner
+            try
             {
-                Name = runnerName,
-                IsRunning = true
-            }, _cancellationToken).ConfigureAwait(false);
-            _config.SetRunnerIndexer(uniqueIndexer);
-            
-            _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
+                var runnerName = _config.RunnerName;
+
+                _cancelled = false;
+
+                await _runners.Clean(_cancellationToken).ConfigureAwait(false);
+                var uniqueIndexer = await _runners.Register(new QueueRunner
+                {
+                    Name = runnerName,
+                    IsRunning = true
+                }, _cancellationToken).ConfigureAwait(false);
+                _config.SetRunnerIndexer(uniqueIndexer);
+
+                _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An Error Occurred");
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private async Task SetStopped()
