@@ -34,6 +34,18 @@ namespace N17Solutions.Microphobia
             var taskInfo = expression.ToTaskInfo(tags);
             return Enqueue(taskInfo);
         }
+
+        public Task Enqueue(Expression<Func<Task>> expression, IEnumerable<string> tags = default)
+        {
+            var taskInfo = expression.ToTaskInfo(tags);
+            return Enqueue(taskInfo);
+        }
+        
+        public Task Enqueue<TExecutor>(Expression<Func<TExecutor, Task>> expression, IEnumerable<string> tags = default)
+        {
+            var taskInfo = expression.ToTaskInfo(tags);
+            return Enqueue(taskInfo);
+        }
         
         public async Task<TaskInfo> DequeueSingle(string tag = default, CancellationToken cancellationToken = default)
         {

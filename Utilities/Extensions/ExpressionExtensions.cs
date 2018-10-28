@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.Utilities.Expressions;
 
@@ -22,6 +23,24 @@ namespace N17Solutions.Microphobia.Utilities.Extensions
         {
             var methodCallArgumentResolutionVisitor = new MethodCallArgumentResolutionVisitor();
             var expressionWithArgumentsResolved = (Expression<Action>) methodCallArgumentResolutionVisitor.Visit(expression);
+
+            var methodExpression = (MethodCallExpression) expressionWithArgumentsResolved?.Body;
+            return methodExpression == null ? null : GetTaskInfo(methodExpression, tags);
+        }
+        
+        public static TaskInfo ToTaskInfo(this Expression<Func<Task>> expression, IEnumerable<string> tags = default)
+        {
+            var methodCallArgumentResolutionVisitor = new MethodCallArgumentResolutionVisitor();
+            var expressionWithArgumentsResolved = (Expression<Func<Task>>) methodCallArgumentResolutionVisitor.Visit(expression);
+
+            var methodExpression = (MethodCallExpression) expressionWithArgumentsResolved?.Body;
+            return methodExpression == null ? null : GetTaskInfo(methodExpression, tags);
+        }
+
+        public static TaskInfo ToTaskInfo<TExecutor>(this Expression<Func<TExecutor, Task>> expression, IEnumerable<string> tags = default)
+        {
+            var methodCallArgumentResolutionVisitor = new MethodCallArgumentResolutionVisitor();
+            var expressionWithArgumentsResolved = (Expression<Func<TExecutor, Task>>) methodCallArgumentResolutionVisitor.Visit(expression);
 
             var methodExpression = (MethodCallExpression) expressionWithArgumentsResolved?.Body;
             return methodExpression == null ? null : GetTaskInfo(methodExpression, tags);

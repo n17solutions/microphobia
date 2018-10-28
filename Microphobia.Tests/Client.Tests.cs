@@ -432,11 +432,11 @@ namespace N17Solutions.Microphobia.Tests
         {
             // Arrange
             File.Delete("TEST.async.txt");
-            Expression<Action<TestOperations>> expression = to => to.FileCreatorAsync();
+            Expression<Func<TestOperations, Task>> expression = to => to.FileCreatorAsync();
             _dataProviderMock.SetupSequence(x => x.DequeueSingle(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expression.ToTaskInfo())
                 .ReturnsAsync(null);
-            
+
             var finished = false;
 
             async Task LoopUntilFinished()
@@ -856,7 +856,7 @@ namespace N17Solutions.Microphobia.Tests
         {
             // Arrange
             File.Delete("TEST.async.txt");
-            Expression<Action<TestOperations>> expression = to => to.FileCreatorAsync();
+            Expression<Func<TestOperations, Task>> expression = to => to.FileCreatorAsync();
             _dataProviderMock.SetupSequence(x => x.Dequeue(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new[] {expression.ToTaskInfo()})
                 .ReturnsAsync(Enumerable.Empty<TaskInfo>());
