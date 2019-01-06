@@ -64,38 +64,39 @@ namespace N17Solutions.Microphobia
                                 
                                 break;
                             }
-
-                            Queue queue;
-                            using (var serviceScope = _serviceScopeFactory.CreateScope())
-                                queue = serviceScope.ServiceProvider.GetRequiredService<Queue>();
-                            
+                           
                             var tasksToProcess = new List<TaskInfo>();
-                            
-                            if (_config.MaxThreads == 1)
-                                tasksToProcess.Add(await queue.DequeueSingle(_config.Tag, cancellationToken).ConfigureAwait(false));
-                            else
-                                tasksToProcess.AddRange(await queue.Dequeue(_config.Tag, cancellationToken: cancellationToken).ConfigureAwait(false));
 
-                            tasksToProcess.RemoveAll(t => t == null);
-                            
-                            _logger.LogInformation($"Tasks To Process: {tasksToProcess.Count}");
-                            
-                            if (tasksToProcess.IsNullOrEmpty())
+                            using (var serviceScope = _serviceScopeFactory.CreateScope())
                             {
-                                if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
-                                    _logger.LogInformation("Nothing to Dequeue");
-                                
-                                OnAllTasksProcessed(new EventArgs());
-                            }
-                            else
-                            {
-                                _nothingToDequeueCount = 0;
+                                var queue = serviceScope.ServiceProvider.GetRequiredService<Queue>();
 
-                                var threadChunks = tasksToProcess.Chunk(_config.MaxThreads);
-                                foreach (var chunk in threadChunks)
-                                    await Task.WhenAll(chunk.Select(taskToProcess => ProcessTask(queue, taskToProcess))).ConfigureAwait(false);
+                                if (_config.MaxThreads == 1)
+                                    tasksToProcess.Add(await queue.DequeueSingle(_config.Tag, cancellationToken).ConfigureAwait(false));
+                                else
+                                    tasksToProcess.AddRange(await queue.Dequeue(_config.Tag, cancellationToken: cancellationToken).ConfigureAwait(false));
+
+                                tasksToProcess.RemoveAll(t => t == null);
+
+                                _logger.LogInformation($"Tasks To Process: {tasksToProcess.Count}");
+
+                                if (tasksToProcess.IsNullOrEmpty())
+                                {
+                                    if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
+                                        _logger.LogInformation("Nothing to Dequeue");
+
+                                    OnAllTasksProcessed(new EventArgs());
+                                }
+                                else
+                                {
+                                    _nothingToDequeueCount = 0;
+
+                                    var threadChunks = tasksToProcess.Chunk(_config.MaxThreads);
+                                    foreach (var chunk in threadChunks)
+                                        await Task.WhenAll(chunk.Select(taskToProcess => ProcessTask(queue, taskToProcess))).ConfigureAwait(false);
+                                }
                             }
-                            
+
                             await Task.Delay(_config.PollIntervalMs, cancellationToken).ConfigureAwait(false);
                         }
                     }, cancellationToken);
