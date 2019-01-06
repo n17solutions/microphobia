@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.ServiceContract.Websockets.Hubs;
 
@@ -20,7 +21,7 @@ namespace N17Solutions.Microphobia.Dashboard.Controllers
         [HttpGet]
         public async Task<IActionResult> ListRunners()
         {
-            var runners = await _dataProvider.GetRunners();
+            var runners = await _dataProvider.GetRunners(cancellationToken: Request.HttpContext.RequestAborted);
             return Ok(runners);
         }
     }

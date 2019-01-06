@@ -165,7 +165,7 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Providers
             CancellationToken cancellationToken = default)
         {
             var query = _context.Runners.AsQueryable();
-            query = tag.IsDefault() ? query.Where(runner => string.IsNullOrEmpty(runner.Tag)) : query.Where(runner => runner.Tag == tag);
+            query = tag.IsDefault() ? query : query.Where(runner => runner.Tag == tag);
             query = query.Where(runner => runner.IsRunning == isRunning);
 
             if (lastUpdatedSince.HasValue || lastUpdatedBefore.HasValue)
