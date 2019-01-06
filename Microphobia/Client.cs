@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -13,7 +12,6 @@ using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 using N17Solutions.Microphobia.Utilities.Extensions;
-using Newtonsoft.Json;
 using Polly;
 // ReSharper disable SuggestBaseTypeForParameter
 
@@ -25,9 +23,6 @@ namespace N17Solutions.Microphobia
         private readonly MicrophobiaConfiguration _config;
         private readonly ILogger _logger;
 
-        private readonly IServiceScope _serviceScope;
-        private readonly Runners _runners; 
-        
         private CancellationToken _cancellationToken;
         private uint _nothingToDequeueCount;
         private bool _cancelled;
@@ -37,9 +32,6 @@ namespace N17Solutions.Microphobia
             _serviceScopeFactory = serviceScopeFactory;
             _config = config;
             _logger = logger;
-
-            _serviceScope = serviceScopeFactory.CreateScope();
-            _runners = _serviceScope.ServiceProvider.GetRequiredService<Runners>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -73,7 +65,10 @@ namespace N17Solutions.Microphobia
                                 break;
                             }
 
-                            var queue = _serviceScope.ServiceProvider.GetRequiredService<Queue>();
+                            Queue queue;
+                            using (var serviceScope = _serviceScopeFactory.CreateScope())
+                                queue = serviceScope.ServiceProvider.GetRequiredService<Queue>();
+                            
                             var tasksToProcess = new List<TaskInfo>();
                             
                             if (_config.MaxThreads == 1)
@@ -133,7 +128,11 @@ namespace N17Solutions.Microphobia
                 await LogTaskException(task, ex, queue).ConfigureAwait(false);
             }
 
-            await _runners.MarkTaskProcessedTime(_config.RunnerName, _cancellationToken);
+            using (var serviceScope = _serviceScopeFactory.CreateScope())
+            {
+                var runners = serviceScope.ServiceProvider.GetRequiredService<Runners>();
+                    await runners.MarkTaskProcessedTime(_config.RunnerName, _cancellationToken);
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -145,7 +144,6 @@ namespace N17Solutions.Microphobia
         public void Dispose()
         {
             _cancelled = true;
-            _serviceScope.Dispose();
         }
         
         public event EventHandler AllTasksProcessed;
@@ -162,15 +160,19 @@ namespace N17Solutions.Microphobia
 
             _cancelled = false;
 
-            await _runners.Clean(_cancellationToken).ConfigureAwait(false);
-            var uniqueIndexer = await _runners.Register(new QueueRunner
+            using (var serviceScope = _serviceScopeFactory.CreateScope())
             {
-                Name = runnerName,
-                IsRunning = true
-            }, _cancellationToken).ConfigureAwait(false);
-            _config.SetRunnerIndexer(uniqueIndexer);
-
-            _logger.LogInformation($"Microphobia Client '{runnerName}' is starting");
+                var runners = serviceScope.ServiceProvider.GetRequiredService<Runners>();
+                await runners.Clean(_cancellationToken).ConfigureAwait(false);
+                var uniqueIndexer = await runners.Register(new QueueRunner
+                {
+                    Name = runnerName,
+                    IsRunning = true
+                }, _cancellationToken).ConfigureAwait(false);
+                _config.SetRunnerIndexer(uniqueIndexer);
+            }
+            
+            _logger.LogInformation($"Microphobia Client '{runnerName}' is starting...");
         }
 
         private async Task SetStopped()

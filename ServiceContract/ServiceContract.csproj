@@ -21,9 +21,9 @@
     <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Humanizer.Core.uk" Version="2.5.1" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Humanizer.Core.uk" Version="2.5.16" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceResolution\ServiceResolution.csproj" />

@@ -2,10 +2,10 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Postgres.Harness</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Postgres.Harness</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microphobia.Postgres\Microphobia.Postgres.csproj" />
