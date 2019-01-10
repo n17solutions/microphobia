@@ -26,7 +26,7 @@ namespace N17Solutions.Microphobia.Dashboard
 
         public static void ConfigureDashboardServiceProvider(this IServiceCollection services, IServiceProvider serviceProvider)
         {
-            services.AddSignalR();
+            services.AddSignalR(options => { options.KeepAliveInterval = TimeSpan.FromMinutes(2); });
             
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaConfiguration>());
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaHubContext>());
