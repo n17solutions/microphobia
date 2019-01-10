@@ -16,7 +16,7 @@ namespace N17Solutions.Microphobia.Dashboard
             WebHost.CreateDefaultBuilder(null)
                 .ConfigureServices(servicesCollection =>
                 {
-                    servicesCollection.ConfigureDashboardServiceProvider(serviceProvider);
+                    servicesCollection.ConfigureDashboardServiceProvider(serviceProvider, options.CachingOptions);
                 })
                 .UseStartup(typeof(DashboardStartup))
                 .UseUrls($"{options.DashboardUri}")

@@ -8,6 +8,11 @@ namespace N17Solutions.Microphobia.Dashboard
     public class MicrophobiaDashboardOptions
     {
         /// <summary>
+        /// The options pertaining to using a cache for Websockets
+        /// </summary>
+        public WebsocketCachingOptions CachingOptions { get; set; }
+        
+        /// <summary>
         /// Gets or sets a route prefix for accessing the microphoia dashboard
         /// </summary>
         public string RoutePrefix { get; set; } = "microphobia";
@@ -21,7 +26,7 @@ namespace N17Solutions.Microphobia.Dashboard
         /// Gets or sets a Uri to use for the Dashboard.
         /// </summary>
         /// <remarks>Used when hosting in a stand-alone environment</remarks>
-        public Uri DashboardUri { get; set; } = new Uri("http://0.0.0.0:5000");
+        public Uri DashboardUri { get; set; } = new Uri("http://0.0.0.0");
 
         /// <summary>
         /// The Stream to use to render the index page.

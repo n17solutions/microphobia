@@ -24,9 +24,11 @@ namespace N17Solutions.Microphobia.Dashboard
             return services;
         }
 
-        public static void ConfigureDashboardServiceProvider(this IServiceCollection services, IServiceProvider serviceProvider)
+        public static void ConfigureDashboardServiceProvider(this IServiceCollection services, IServiceProvider serviceProvider, WebsocketCachingOptions cachingOptions)
         {
-            services.AddSignalR(options => { options.KeepAliveInterval = TimeSpan.FromMinutes(2); });
+            var signalRBuilder = services.AddSignalR(options => { options.KeepAliveInterval = TimeSpan.FromMinutes(2); });
+            if (cachingOptions.UseCache)
+                signalRBuilder.AddStackExchangeRedis(cachingOptions.RedisConnectionString, options => { options.Configuration.ChannelPrefix = cachingOptions.ChannelPrefix; });
             
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaConfiguration>());
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaHubContext>());
@@ -43,7 +45,7 @@ namespace N17Solutions.Microphobia.Dashboard
             if (client == null)
                 throw new InvalidOperationException("Microphobia Client hasn't been registered. Be sure to call the data provider add services method before initialising the dashboard.");
 
-            services.AddSingleton(_ => client);
+            services.AddSingleton(client);
         }
     }
 }

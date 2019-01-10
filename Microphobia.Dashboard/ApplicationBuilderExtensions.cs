@@ -22,13 +22,10 @@ namespace N17Solutions.Microphobia.Dashboard
 
             app.UseBranchedApplicationBuilder(routePrefix, services =>
             {
-                services.ConfigureDashboardServiceProvider(app.ApplicationServices);
+                services.ConfigureDashboardServiceProvider(app.ApplicationServices, options.CachingOptions);
                                                 
                 services.ConfigureServicesForStandaloneMicrophobiaDashboard();
-            }, builderConfig =>
-            {
-                builderConfig.ConfigureApplicationForMicrophobiaDashboard(options);
-            });
+            }, builderConfig => builderConfig.ConfigureApplicationForMicrophobiaDashboard(options));
 
             var hubContext = app.ApplicationServices.GetRequiredService<MicrophobiaHubContext>();
             hubContext.ReplaceHubContext(app.ApplicationServices.GetRequiredService<IHubContext<MicrophobiaHub>>());
