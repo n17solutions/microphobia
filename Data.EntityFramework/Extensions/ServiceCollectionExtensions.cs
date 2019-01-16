@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using N17Solutions.Microphobia.Data.EntityFramework.Providers;
 using N17Solutions.Microphobia.ServiceContract.Providers;
 
@@ -9,8 +10,9 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Extensions
     {
         public static IServiceCollection AddEntityFramework(this IServiceCollection services)
         {
-            services.AddTransient<IDataProvider, DataProvider>();
-            services.AddTransient<ISystemLogProvider, SystemLogProvider>();
+            services.TryAddScoped<IDataProvider, DataProvider>();
+            services.TryAddScoped<ISystemLogProvider, SystemLogProvider>();
+
             return services;
         }
     }
