@@ -17,7 +17,7 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <InformationalVersion>1.0.0</InformationalVersion>
-    <PackageIconUrl>http://www.n17solutions.com/assets/images/logo-dark%20background.png</PackageIconUrl>
+    <PackageIconUrl>https://www.gravatar.com/avatar/939d330d00b469c8f2f92327c0e03073</PackageIconUrl>
     <RepositoryUrl>https://github.com/n17solutions/microphobia</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
