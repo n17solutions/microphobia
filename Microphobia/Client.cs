@@ -91,9 +91,13 @@ namespace N17Solutions.Microphobia
                                 {
                                     _nothingToDequeueCount = 0;
 
+                                    // TODO: Sort all this shit out properly. Currently it's throwing errors due to concurrent usage of DBContext
+                                    // TODO: Probably need to work out a way to start a new process and therefore get a new context for each task?
+                                    // TODO: Meh I dunno, research it properly, or just give up and use Hangfire.io
                                     var threadChunks = tasksToProcess.Chunk(_config.MaxThreads);
                                     foreach (var chunk in threadChunks)
-                                        await Task.WhenAll(chunk.Select(taskToProcess => ProcessTask(queue, taskToProcess))).ConfigureAwait(false);
+                                    foreach (var thread in chunk)
+                                        await ProcessTask(queue, thread);
                                 }
                             }
 
