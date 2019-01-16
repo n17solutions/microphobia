@@ -10,8 +10,8 @@ namespace N17Solutions.Microphobia.Data.EntityFramework.Extensions
     {
         public static IServiceCollection AddEntityFramework(this IServiceCollection services)
         {
-            services.TryAddScoped<IDataProvider, DataProvider>();
-            services.TryAddScoped<ISystemLogProvider, SystemLogProvider>();
+            services.TryAddTransient<IDataProvider, DataProvider>();
+            services.TryAddTransient<ISystemLogProvider, SystemLogProvider>();
 
             return services;
         }

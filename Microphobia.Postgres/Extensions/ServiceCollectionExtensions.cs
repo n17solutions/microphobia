@@ -26,8 +26,15 @@ namespace N17Solutions.Microphobia.Postgres.Extensions
             Migrate(connectionString);
 
             services
-                .AddDbContext<TaskContext>(options => options.UseNpgsql(connectionString, npgsqlOptions => { npgsqlOptions.MigrationsAssembly(CurrentAssemblyName); }))
-                .AddDbContext<SystemLogContext>(options => options.UseNpgsql(connectionString, npgsqlOptions => { npgsqlOptions.MigrationsAssembly(CurrentAssemblyName); }))
+                .AddDbContext<TaskContext>(options => 
+                    options.UseNpgsql(connectionString, npgsqlOptions =>
+                    {
+                        npgsqlOptions.MigrationsAssembly(CurrentAssemblyName);
+                    }),ServiceLifetime.Transient, ServiceLifetime.Transient)
+                .AddDbContext<SystemLogContext>(options => options.UseNpgsql(connectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsAssembly(CurrentAssemblyName);
+                }), ServiceLifetime.Transient, ServiceLifetime.Transient)
                 .AddEntityFramework()
                 .AddMicrophobia();
             
