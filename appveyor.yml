@@ -23,7 +23,7 @@ before_build:
   - cmd: dotnet msbuild Microphobia.Dashboard -t:BuildWebApp
 build_script:
   - cmd: dotnet build --verbosity m
-  - cmd: dotnet test --no-restore --no-build
+#  - cmd: dotnet test --no-restore --no-build
   - cmd: dotnet pack --no-restore --no-build
 deploy:
  provider: NuGet
