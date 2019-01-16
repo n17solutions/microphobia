@@ -18,8 +18,9 @@ namespace N17Solutions.Microphobia.Extensions
             return services
                 .AddSingleton<MicrophobiaMarkerClass>()
                 .AddSingleton(serviceProvider => new MicrophobiaHubContext(serviceProvider.GetRequiredService<IHubContext<MicrophobiaHub>>()))
-                .AddScoped<Queue>()
+                .AddTransient<Queue>()
                 .AddScoped<Runners>()
+                .AddScoped<TaskProcessor>()
                 .AddSingleton<IHostedService, Client>();
         }
     }

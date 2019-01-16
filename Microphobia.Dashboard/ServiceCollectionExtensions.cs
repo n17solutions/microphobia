@@ -27,7 +27,7 @@ namespace N17Solutions.Microphobia.Dashboard
         public static void ConfigureDashboardServiceProvider(this IServiceCollection services, IServiceProvider serviceProvider, WebsocketCachingOptions cachingOptions)
         {
             var signalRBuilder = services.AddSignalR(options => { options.KeepAliveInterval = TimeSpan.FromMinutes(2); });
-            if (cachingOptions.UseCache)
+            if (cachingOptions?.UseCache ?? false)
                 signalRBuilder.AddStackExchangeRedis(cachingOptions.RedisConnectionString, options => { options.Configuration.ChannelPrefix = cachingOptions.ChannelPrefix; });
             
             services.AddSingleton(_ => serviceProvider.GetRequiredService<MicrophobiaConfiguration>());

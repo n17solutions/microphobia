@@ -130,12 +130,10 @@ namespace N17Solutions.Microphobia.Tests
                 PollIntervalMs = 1000,
                 MaxThreads = 1
             };
-
-            var queueMock = new Queue(_dataProviderMock.Object, microphobiaContextMock);
+            
             var runnersMock = new Runners(_dataProviderMock.Object, configuration);
-
+            
             var serviceProviderMock = new Mock<IServiceProvider>();
-            serviceProviderMock.Setup(x => x.GetService(typeof(Queue))).Returns(queueMock);
             serviceProviderMock.Setup(x => x.GetService(typeof(Runners))).Returns(runnersMock);
             
             var serviceScopeMock = new Mock<IServiceScope>();
@@ -143,10 +141,12 @@ namespace N17Solutions.Microphobia.Tests
             var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
             serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(serviceScopeMock.Object);
 
+            var queueMock = new Queue(_dataProviderMock.Object, microphobiaContextMock, serviceScopeFactoryMock.Object);
+            
             _cancellationTokenSource = new CancellationTokenSource();
             _logger = new ClientLogger();
             
-            _sut = new Client(serviceScopeFactoryMock.Object, configuration, _logger);
+            _sut = new Client(queueMock, serviceScopeFactoryMock.Object, configuration, _logger);
         }
 
         [Fact]
@@ -557,12 +557,10 @@ namespace N17Solutions.Microphobia.Tests
                 PollIntervalMs = 1000,
                 MaxThreads = 2
             };
-
-            var queueMock = new Queue(_dataProviderMock.Object, microphobiaContextMock);
+            
             var runnersMock = new Runners(_dataProviderMock.Object, configuration);
-
+            
             var serviceProviderMock = new Mock<IServiceProvider>();
-            serviceProviderMock.Setup(x => x.GetService(typeof(Queue))).Returns(queueMock);
             serviceProviderMock.Setup(x => x.GetService(typeof(Runners))).Returns(runnersMock);
             
             var serviceScopeMock = new Mock<IServiceScope>();
@@ -570,10 +568,12 @@ namespace N17Solutions.Microphobia.Tests
             var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
             serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(serviceScopeMock.Object);
 
+            var queueMock = new Queue(_dataProviderMock.Object, microphobiaContextMock, serviceScopeFactoryMock.Object);
+            
             _cancellationTokenSource = new CancellationTokenSource();
             _logger = new ClientLogger();
             
-            _sut = new Client(serviceScopeFactoryMock.Object, configuration, _logger);
+            _sut = new Client(queueMock, serviceScopeFactoryMock.Object, configuration, _logger);
         }
 
         [Fact]

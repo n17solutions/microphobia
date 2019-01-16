@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using N17Solutions.Microphobia.ServiceContract;
 using N17Solutions.Microphobia.ServiceContract.Configuration;
 using N17Solutions.Microphobia.ServiceContract.Models;
 using N17Solutions.Microphobia.ServiceContract.Providers;
@@ -20,6 +17,7 @@ namespace N17Solutions.Microphobia
     public class Client : IHostedService, IDisposable
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly Queue _queue;
         private readonly MicrophobiaConfiguration _config;
         private readonly ILogger _logger;
 
@@ -27,8 +25,9 @@ namespace N17Solutions.Microphobia
         private uint _nothingToDequeueCount;
         private bool _cancelled;
 
-        public Client(IServiceScopeFactory serviceScopeFactory, MicrophobiaConfiguration config, ILogger<Client> logger)
+        public Client(Queue queue, IServiceScopeFactory serviceScopeFactory, MicrophobiaConfiguration config, ILogger<Client> logger)
         {
+            _queue = queue;
             _serviceScopeFactory = serviceScopeFactory;
             _config = config;
             _logger = logger;
@@ -54,54 +53,49 @@ namespace N17Solutions.Microphobia
                     var task = Task.Run(async () =>
                     {
                         await SetStarted();
-                        
+
                         while (true)
                         {
                             if (_cancellationToken.IsCancellationRequested || _cancelled)
                             {
-                                await StopAsync(_cancellationToken).ConfigureAwait(false);
+                                await StopAsync(_cancellationToken);
                                 _cancellationToken.ThrowIfCancellationRequested();
-                                
+
                                 break;
                             }
-                           
+
                             var tasksToProcess = new List<TaskInfo>();
+                            if (_config.MaxThreads == 1)
+                                tasksToProcess.Add(await _queue.DequeueSingle(_config.Tag, cancellationToken));
+                            else
+                                tasksToProcess.AddRange(await _queue.Dequeue(_config.Tag, cancellationToken: cancellationToken));
 
-                            using (var serviceScope = _serviceScopeFactory.CreateScope())
+                            tasksToProcess.RemoveAll(t => t == null);
+
+                            _logger.LogInformation($"Tasks To Process: {tasksToProcess.Count}");
+
+                            if (tasksToProcess.IsNullOrEmpty())
                             {
-                                var queue = serviceScope.ServiceProvider.GetRequiredService<Queue>();
+                                if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
+                                    _logger.LogInformation("Nothing to Dequeue");
 
-                                if (_config.MaxThreads == 1)
-                                    tasksToProcess.Add(await queue.DequeueSingle(_config.Tag, cancellationToken).ConfigureAwait(false));
-                                else
-                                    tasksToProcess.AddRange(await queue.Dequeue(_config.Tag, cancellationToken: cancellationToken).ConfigureAwait(false));
+                                OnAllTasksProcessed(new EventArgs());
+                            }
+                            else
+                            {
+                                _nothingToDequeueCount = 0;
 
-                                tasksToProcess.RemoveAll(t => t == null);
-
-                                _logger.LogInformation($"Tasks To Process: {tasksToProcess.Count}");
-
-                                if (tasksToProcess.IsNullOrEmpty())
+                                foreach (var taskInfo in tasksToProcess)
                                 {
-                                    if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
-                                        _logger.LogInformation("Nothing to Dequeue");
-
-                                    OnAllTasksProcessed(new EventArgs());
-                                }
-                                else
-                                {
-                                    _nothingToDequeueCount = 0;
-
-                                    // TODO: Sort all this shit out properly. Currently it's throwing errors due to concurrent usage of DBContext
-                                    // TODO: Probably need to work out a way to start a new process and therefore get a new context for each task?
-                                    // TODO: Meh I dunno, research it properly, or just give up and use Hangfire.io
-                                    var threadChunks = tasksToProcess.Chunk(_config.MaxThreads);
-                                    foreach (var chunk in threadChunks)
-                                    foreach (var thread in chunk)
-                                        await ProcessTask(queue, thread);
+                                    using (var scope = _serviceScopeFactory.CreateScope())
+                                    {
+                                        var taskProcessor = scope.ServiceProvider.GetRequiredService<TaskProcessor>();
+                                        await taskProcessor.ProcessTask(taskInfo, cancellationToken: cancellationToken);
+                                    }
                                 }
                             }
 
-                            await Task.Delay(_config.PollIntervalMs, cancellationToken).ConfigureAwait(false);
+                            await Task.Delay(_config.PollIntervalMs, cancellationToken);
                         }
                     }, cancellationToken);
                     
@@ -112,32 +106,6 @@ namespace N17Solutions.Microphobia
                 });
 
             return Task.CompletedTask;
-        }
-
-        private async Task ProcessTask(Queue queue, TaskInfo task)
-        {
-            _logger.LogInformation($"Dequeued Task: {task.Id}");
-            await LogTaskStarted(task, queue).ConfigureAwait(false);
-                
-            try
-            {
-                var stopWatch = new Stopwatch();
-                stopWatch.Start();
-                task.Execute(_config.ServiceFactory, _cancellationToken);
-
-                stopWatch.Stop();
-                await LogTaskCompleted(task, stopWatch.Elapsed, queue).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await LogTaskException(task, ex, queue).ConfigureAwait(false);
-            }
-
-            using (var serviceScope = _serviceScopeFactory.CreateScope())
-            {
-                var runners = serviceScope.ServiceProvider.GetRequiredService<Runners>();
-                    await runners.MarkTaskProcessedTime(_config.RunnerName, _cancellationToken);
-            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -212,30 +180,6 @@ namespace N17Solutions.Microphobia
             }
     
             _logger.LogCritical($"An error occurred while running the Microphobia Client and has been logged to the System Log with Resource Id: {logEntryId}");
-        }
-        
-        private async Task LogTaskStarted(TaskInfo taskInfo, Queue queue)
-        {
-            var logMessage = Messages.TaskStarted(taskInfo);
-            _logger.LogInformation(logMessage);
-
-            await queue.SetQueuedTaskRunning(taskInfo);
-        }
-        
-        private async Task LogTaskCompleted(TaskInfo taskInfo, TimeSpan completionTime, Queue queue)
-        {
-            var logMessage = Messages.TaskFinished(taskInfo, completionTime);
-            _logger.LogInformation(logMessage);
-            
-            await queue.SetQueuedTaskCompleted(taskInfo);
-        }
-        
-        private async Task LogTaskException(TaskInfo taskInfo, Exception ex, Queue queue)
-        {
-            var logMessage = Messages.TaskThrewException(taskInfo);
-            _logger.LogError(ex, logMessage);
-
-            await queue.SetQueuedTaskFaulted(taskInfo, ex).ConfigureAwait(false);
         }
     }
 }
