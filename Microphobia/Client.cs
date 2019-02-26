@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,12 +73,13 @@ namespace N17Solutions.Microphobia
 
                             tasksToProcess.RemoveAll(t => t == null);
 
-                            _logger.LogInformation($"Tasks To Process: {tasksToProcess.Count}");
+                            var tasksToProcessCount = tasksToProcess.Count;
+                            _logger.Log(tasksToProcessCount > 0 ? LogLevel.Information : LogLevel.Trace, $"Tasks To Process: {tasksToProcessCount}");
 
                             if (tasksToProcess.IsNullOrEmpty())
                             {
                                 if (_nothingToDequeueCount++ < _config.StopLoggingNothingToQueueAfter)
-                                    _logger.LogInformation("Nothing to Dequeue");
+                                    _logger.LogTrace("Nothing to Dequeue");
 
                                 OnAllTasksProcessed(new EventArgs());
                             }
