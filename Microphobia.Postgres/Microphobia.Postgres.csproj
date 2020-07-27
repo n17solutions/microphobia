@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>N17Solutions.Microphobia.Postgres</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Postgres</RootNamespace>
     <LangVersion>latest</LangVersion>

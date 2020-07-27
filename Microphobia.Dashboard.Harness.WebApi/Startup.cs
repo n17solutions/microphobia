@@ -34,12 +34,11 @@ namespace Microphobia.Dashboard.Harness.WebApi
                 .AddTransient<InjectMe>()
                 .AddTransient<ComplicatedEnqueueMe>()
                 .AddMicrophobiaPostgresStorage(Configuration.GetConnectionString("Microphobia"))
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IApplicationLifetime applicationLifetime, IHostingEnvironment env, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IHostApplicationLifetime applicationLifetime, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
@@ -52,8 +51,6 @@ namespace Microphobia.Dashboard.Harness.WebApi
                 config.Tag = "WebApi";
             });
             app.UseMicrophobiaDashboard();
-
-            app.UseMvc();
 
             applicationLifetime.ApplicationStopping.Register(async () => await OnShutdown(serviceProvider.GetServices<IHostedService>()));
         }

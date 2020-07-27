@@ -1,4 +1,7 @@
-#### Release 3.0.0 - 17.10.2017
+#### Release 4.0.0 - 27.07.2020
+  * Move to Dotnet Core 3
+
+#### Release 3.0.0 - 17.10.2018
   *  Move to chunked task processing
   *  Allow multiple runners
   *  Allow tagged task

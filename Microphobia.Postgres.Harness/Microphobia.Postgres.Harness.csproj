@@ -5,7 +5,7 @@
     <AssemblyName>N17Solutions.Microphobia.Postgres.Harness</AssemblyName>
     <RootNamespace>N17Solutions.Microphobia.Postgres.Harness</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microphobia.Postgres\Microphobia.Postgres.csproj" />
